@@ -9,8 +9,8 @@ using EaisApi.Models;
 namespace WebUI.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20170812163945_DiagCard")]
-    partial class DiagCard
+    [Migration("20170812165548_DiagCardAndUser")]
+    partial class DiagCardAndUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
