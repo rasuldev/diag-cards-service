@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using WebUI.Models;
 
 namespace WebUI.Data.Entities
 {

@@ -1,0 +1,197 @@
+@model IEnumerable<WebUI.Data.Entities.DiagnosticCard>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.OId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Lastname)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Firstname)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Patronymic)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.VIN)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IssueYear)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Manufacturer)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Model)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.BodyNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FrameNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Running)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.RegNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Weight)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CategoryCommon)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TyreManufacturer)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AllowedMaxWeight)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FuelType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.BrakeType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DocumentType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsForeigner)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DocumentSeries)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DocumentNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DocumentIssueDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DocumentIssuer)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Note)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ExpirationDate)
+                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lastname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Firstname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Patronymic)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VIN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IssueYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Manufacturer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Model)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BodyNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FrameNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Running)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Weight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryCommon)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TyreManufacturer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AllowedMaxWeight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FuelType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BrakeType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DocumentType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsForeigner)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DocumentSeries)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DocumentNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DocumentIssueDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DocumentIssuer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExpirationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Id)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

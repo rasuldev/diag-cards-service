@@ -10,4 +10,5 @@ namespace WebUI.Data.Entities
         public bool IsRemoved { get; set; }
         public ICollection<DiagnosticCard> DiagnosticCards { get; set; }
     }
+    
 }
