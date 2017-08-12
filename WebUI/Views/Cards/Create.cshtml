@@ -111,7 +111,7 @@
         <div class="form-group">
             <label asp-for="Category" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="Category" class="form-control"></select>
+                <select asp-for="Category" asp-items="ViewBag.CategoriesList" class="form-control"></select>
                 <span asp-validation-for="Category" class="text-danger"></span>
             </div>
         </div>

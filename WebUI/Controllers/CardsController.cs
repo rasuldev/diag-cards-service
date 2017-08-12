@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EaisApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebUI.Data;
-using WebUI.Data.Entities;
+using DiagnosticCard = WebUI.Data.Entities.DiagnosticCard;
 
 namespace WebUI.Controllers
 {
@@ -49,6 +50,7 @@ namespace WebUI.Controllers
         public IActionResult Create()
         {
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            CreateOrEditInit();
             return View();
         }
 
@@ -66,6 +68,7 @@ namespace WebUI.Controllers
                 return RedirectToAction("Index");
             }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", diagnosticCard.UserId);
+            CreateOrEditInit();
             return View(diagnosticCard);
         }
 
@@ -155,6 +158,15 @@ namespace WebUI.Controllers
         private bool DiagnosticCardExists(int id)
         {
             return _context.DiagnosticCards.Any(e => e.Id == id);
+        }
+
+        private void CreateOrEditInit()
+        {
+            var categories = new List<object>() { new { code = "", value = "" }};
+            categories.AddRange(
+                Enum.GetValues(typeof(VehicleCategory)).Cast<VehicleCategory>()
+                    .Select(x => new {code = x, value = x.ToString()}));
+            ViewData["CategoriesList"] = new SelectList(categories, "code", "value");
         }
     }
 }
