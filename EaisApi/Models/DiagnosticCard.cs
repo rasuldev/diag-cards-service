@@ -6,9 +6,8 @@ namespace EaisApi.Models
 {
     public class DiagnosticCard
     {
-        public int Id { get; set; }
         [MaxLength(30)]
-        public string OId { get; set; }
+        public string СardId { get; set; }
         [Required, Display(Name="Фамилия"), MaxLength(30)]
         public string Lastname { get; set; }
         [Required, Display(Name = "Имя"), MaxLength(30)]

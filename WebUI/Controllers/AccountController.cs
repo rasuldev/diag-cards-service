@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebUI.Data.Entities;
-using WebUI.Models;
 using WebUI.Models.AccountViewModels;
 using WebUI.Services;
 
