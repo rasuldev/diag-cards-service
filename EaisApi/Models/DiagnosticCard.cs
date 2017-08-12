@@ -4,50 +4,47 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EaisApi.Models
 {
-    public class VehicleInfo
+    public class DiagnosticCard
     {
-        [Display(Name="Фамилия")]
-        [Required]
+        public int Id { get; set; }
+        [MaxLength(30)]
+        public string OId { get; set; }
+        [Required, Display(Name="Фамилия"), MaxLength(30)]
         public string Lastname { get; set; }
-        [Display(Name = "Имя")]
-        [Required]
+        [Required, Display(Name = "Имя"), MaxLength(30)]
         public string Firstname { get; set; }
-        [Display(Name = "Отчество")]
+        [Display(Name = "Отчество"), MaxLength(30)]
         public string Patronymic { get; set; }
-        [StringLength(17)]
+        [StringLength(17), Display(Name = "ВИН")]
         public string VIN { get; set; }
-        [Display(Name="Год выпуска ТС")]
-        [Required]
+        [Required, Display(Name="Год выпуска ТС")]
         public int IssueYear { get; set; }
 
         /// <summary>
         /// Марка ТС
         /// </summary>
-        [Display(Name = "Марка ТС")]
-        [Required]
+        [Required, Display(Name = "Марка ТС"), MaxLength(30)]
         public string Manufacturer { get; set; }
 
         /// <summary>
         /// Модель ТС
         /// </summary>
-        [Display(Name = "Модель ТС")]
-        [Required]
+        [Required, Display(Name = "Модель ТС"), MaxLength(30)]
         public string Model { get; set; }
 
-        [Display(Name="Кузов №")]
+        [Display(Name="Кузов №"), MaxLength(50)]
         public string BodyNumber { get; set; }
-        [Display(Name="Рама (Шасси) №")]
+        [Display(Name="Рама (Шасси) №"), MaxLength(50)]
         public string FrameNumber { get; set; }
         [Display(Name="Пробег ТС (км)"), Range(100, int.MaxValue)]
         public int Running { get; set; }
-        [Display(Name = "Государственный регистрационный знак")]
+        [Display(Name = "Государственный регистрационный знак"), MaxLength(10)]
         public string RegNumber { get; set; }
         
         /// <summary>
         /// Масса без нагрузки (кг)
         /// </summary>
-        [Display(Name = "Масса без нагрузки (кг)")]
-        [Required]
+        [Required, Display(Name = "Масса без нагрузки (кг)")]
         public int Weight { get; set; }
 
         [Required, Display(Name = "Категория ТС (СРТС или ПТС)")]
@@ -56,7 +53,7 @@ namespace EaisApi.Models
         [Required, Display(Name = "Категория ТС (ОКП)")]
         public VehicleCategoryCommon CategoryCommon { get; set; }
 
-        [Required, Display(Name = "Марка шин")]
+        [Required, Display(Name = "Марка шин"), MaxLength(30)]
         public string TyreManufacturer { get; set; }
 
         /// <summary>
@@ -83,10 +80,10 @@ namespace EaisApi.Models
         public string DocumentNumber { get; set; }
         [Required, Display(Name = "Дата выдачи")]
         public DateTime DocumentIssueDate { get; set; }
-        [Required, Display(Name = "Выдан кем")]
+        [Required, Display(Name = "Выдан кем"), MaxLength(50)]
         public string DocumentIssuer { get; set; }
 
-        [Display(Name = "Примечание")]
+        [Display(Name = "Примечание"), MaxLength(250)]
         public string Note { get; set; }
 
         [Display(Name = "Срок действия")]

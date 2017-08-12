@@ -1,8 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using WebUI.Data.Entities
 @using WebUI.Models
 
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 
 @if (SignInManager.IsSignedIn(User))
 {

@@ -1,0 +1,13 @@
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+namespace WebUI.Data.Entities
+{
+    // Add profile data for application users by adding properties to the User class
+    public class User : IdentityUser
+    {
+        public bool IsApproved { get; set; }
+        public bool IsRemoved { get; set; }
+        public ICollection<DiagnosticCard> DiagnosticCards { get; set; }
+    }
+}

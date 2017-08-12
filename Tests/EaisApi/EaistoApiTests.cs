@@ -94,7 +94,7 @@ namespace Tests.EaisApi
         {
             try
             {
-                var info = new VehicleInfo()
+                var info = new DiagnosticCard()
                 {
                     Lastname = "ТестМагомедов",
                     Firstname = "ТестМагомед",
