@@ -209,7 +209,7 @@ namespace WebUI.Data.Migrations
 
                     b.Property<int>("Weight");
 
-                    b.Property<string>("СardId")
+                    b.Property<string>("CardId")
                         .HasMaxLength(30);
 
                     b.HasKey("Id");

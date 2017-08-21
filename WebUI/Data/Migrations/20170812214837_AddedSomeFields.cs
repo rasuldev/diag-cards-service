@@ -11,7 +11,7 @@ namespace WebUI.Data.Migrations
             migrationBuilder.RenameColumn(
                 name: "OId",
                 table: "DiagnosticCards",
-                newName: "СardId");
+                newName: "CardId");
 
             migrationBuilder.AlterColumn<bool>(
                 name: "IsApproved",
@@ -42,7 +42,7 @@ namespace WebUI.Data.Migrations
                 table: "DiagnosticCards");
 
             migrationBuilder.RenameColumn(
-                name: "СardId",
+                name: "CardId",
                 table: "DiagnosticCards",
                 newName: "OId");
 
