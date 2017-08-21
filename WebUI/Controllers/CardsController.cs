@@ -75,6 +75,7 @@ namespace WebUI.Controllers
         // GET: Cards/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            CreateOrEditInit();
             if (id == null)
             {
                 return NotFound();
@@ -96,6 +97,7 @@ namespace WebUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UserId,Id,CardId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate")] DiagnosticCard diagnosticCard)
         {
+            CreateOrEditInit();
             if (id != diagnosticCard.Id)
             {
                 return NotFound();
@@ -162,14 +164,14 @@ namespace WebUI.Controllers
 
         private void CreateOrEditInit()
         {
-            ViewData["CategoriesList"] = new SelectList(initVehicleCategoryList(), "code", "value");
-            ViewData["CategoryCommonList"] = new SelectList(initVehicleCategoryCommonList(), "code", "value");
-            ViewData["FuelTypesList"] = new SelectList(initFuelTypesList(), "code", "value");
-            ViewData["BrakeTypesList"] = new SelectList(initBrakeTypesList(), "code", "value");
-            ViewData["DocumentTypesList"] = new SelectList(initDocumentTypesList(), "code", "value");
+            ViewData["CategoriesList"] = new SelectList(InitVehicleCategoryList(), "code", "value");
+            ViewData["CategoryCommonList"] = new SelectList(InitVehicleCategoryCommonList(), "code", "value");
+            ViewData["FuelTypesList"] = new SelectList(InitFuelTypesList(), "code", "value");
+            ViewData["BrakeTypesList"] = new SelectList(InitBrakeTypesList(), "code", "value");
+            ViewData["DocumentTypesList"] = new SelectList(InitDocumentTypesList(), "code", "value");
         }
 
-        private List<object> initVehicleCategoryList()
+        private List<object> InitVehicleCategoryList()
         {
             var categories = new List<object>() { new { code = "", value = "" } };
             categories.AddRange(
@@ -177,7 +179,7 @@ namespace WebUI.Controllers
                     .Select(x => new { code = x, value = x.ToString() }));
             return categories;
         }
-        private List<object> initVehicleCategoryCommonList()
+        private List<object> InitVehicleCategoryCommonList()
         {
             var categories = new List<object>() { new { code = "", value = "" } };
             categories.AddRange(
@@ -185,7 +187,7 @@ namespace WebUI.Controllers
                     .Select(x => new { code = x, value = x.ToString() }));
             return categories;
         }
-        private List<object> initFuelTypesList()
+        private List<object> InitFuelTypesList()
         {
             var categories = new List<object>() { new { code = "", value = "" } };
             categories.AddRange(
@@ -193,7 +195,7 @@ namespace WebUI.Controllers
                     .Select(x => new { code = x, value = x.ToString() }));
             return categories;
         }
-        private List<object> initBrakeTypesList()
+        private List<object> InitBrakeTypesList()
         {
             var categories = new List<object>() { new { code = "", value = "" } };
             categories.AddRange(
@@ -201,7 +203,7 @@ namespace WebUI.Controllers
                     .Select(x => new { code = x, value = x.ToString() }));
             return categories;
         }
-        private List<object> initDocumentTypesList()
+        private List<object> InitDocumentTypesList()
         {
             var categories = new List<object>() { new { code = "", value = "" } };
             categories.AddRange(

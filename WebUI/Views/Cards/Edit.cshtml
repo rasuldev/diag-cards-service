@@ -113,14 +113,14 @@
         <div class="form-group">
             <label asp-for="Category" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="Category" class="form-control"></select>
+                <select asp-for="Category" asp-items="ViewBag.CategoriesList" class="form-control"></select>
                 <span asp-validation-for="Category" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
             <label asp-for="CategoryCommon" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="CategoryCommon" class="form-control"></select>
+                <select asp-for="CategoryCommon" asp-items="ViewBag.CategoryCommonList" class="form-control"></select>
                 <span asp-validation-for="CategoryCommon" class="text-danger"></span>
             </div>
         </div>
@@ -141,21 +141,21 @@
         <div class="form-group">
             <label asp-for="FuelType" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="FuelType" class="form-control"></select>
+                <select asp-for="FuelType" asp-items="ViewBag.FuelTypesList" class="form-control"></select>
                 <span asp-validation-for="FuelType" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
             <label asp-for="BrakeType" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="BrakeType" class="form-control"></select>
+                <select asp-for="BrakeType" asp-items="ViewBag.BrakeTypesList" class="form-control"></select>
                 <span asp-validation-for="BrakeType" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
             <label asp-for="DocumentType" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="DocumentType" class="form-control"></select>
+                <select asp-for="DocumentType" asp-items="ViewBag.DocumentTypesList" class="form-control"></select>
                 <span asp-validation-for="DocumentType" class="text-danger"></span>
             </div>
         </div>
