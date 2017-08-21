@@ -162,11 +162,52 @@ namespace WebUI.Controllers
 
         private void CreateOrEditInit()
         {
-            var categories = new List<object>() { new { code = "", value = "" }};
+            ViewData["CategoriesList"] = new SelectList(initVehicleCategoryList(), "code", "value");
+            ViewData["CategoryCommonList"] = new SelectList(initVehicleCategoryCommonList(), "code", "value");
+            ViewData["FuelTypesList"] = new SelectList(initFuelTypesList(), "code", "value");
+            ViewData["BrakeTypesList"] = new SelectList(initBrakeTypesList(), "code", "value");
+            ViewData["DocumentTypesList"] = new SelectList(initDocumentTypesList(), "code", "value");
+        }
+
+        private List<object> initVehicleCategoryList()
+        {
+            var categories = new List<object>() { new { code = "", value = "" } };
             categories.AddRange(
                 Enum.GetValues(typeof(VehicleCategory)).Cast<VehicleCategory>()
-                    .Select(x => new {code = x, value = x.ToString()}));
-            ViewData["CategoriesList"] = new SelectList(categories, "code", "value");
+                    .Select(x => new { code = x, value = x.ToString() }));
+            return categories;
+        }
+        private List<object> initVehicleCategoryCommonList()
+        {
+            var categories = new List<object>() { new { code = "", value = "" } };
+            categories.AddRange(
+                Enum.GetValues(typeof(VehicleCategoryCommon)).Cast<VehicleCategoryCommon>()
+                    .Select(x => new { code = x, value = x.ToString() }));
+            return categories;
+        }
+        private List<object> initFuelTypesList()
+        {
+            var categories = new List<object>() { new { code = "", value = "" } };
+            categories.AddRange(
+                Enum.GetValues(typeof(FuelTypes)).Cast<FuelTypes>()
+                    .Select(x => new { code = x, value = x.ToString() }));
+            return categories;
+        }
+        private List<object> initBrakeTypesList()
+        {
+            var categories = new List<object>() { new { code = "", value = "" } };
+            categories.AddRange(
+                Enum.GetValues(typeof(BrakeTypes)).Cast<BrakeTypes>()
+                    .Select(x => new { code = x, value = x.ToString() }));
+            return categories;
+        }
+        private List<object> initDocumentTypesList()
+        {
+            var categories = new List<object>() { new { code = "", value = "" } };
+            categories.AddRange(
+                Enum.GetValues(typeof(DocumentTypes)).Cast<DocumentTypes>()
+                    .Select(x => new { code = x, value = x.ToString() }));
+            return categories;
         }
     }
 }
