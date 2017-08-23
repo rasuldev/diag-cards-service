@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebUI.Data.Entities
@@ -9,11 +10,12 @@ namespace WebUI.Data.Entities
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
-
+        [Display(Name = "Дата создания")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         /// <summary>
         /// Saved in Eaisto date
         /// </summary>
+        [Display(Name = "Дата регистрации")]
         public DateTime? RegisteredDate { get; set; }
     }
 }

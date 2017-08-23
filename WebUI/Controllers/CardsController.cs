@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebUI.Data;
 using DiagnosticCard = WebUI.Data.Entities.DiagnosticCard;
+using WebUI.Models;
 
 namespace WebUI.Controllers
 {
@@ -17,14 +18,48 @@ namespace WebUI.Controllers
 
         public CardsController(AppDbContext context)
         {
-            _context = context;    
+            _context = context;
         }
 
         // GET: Cards
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string crSortOrder, string regSortOrder)
         {
+            ViewData["CreateDateSortParm"] = String.IsNullOrEmpty(crSortOrder) ? "desc" : "asc";
+            ViewData["RegDateSortParm"] = String.IsNullOrEmpty(regSortOrder) ? "desc" : "asc";
+
             var appDbContext = _context.DiagnosticCards.Include(d => d.User);
-            return View(await appDbContext.ToListAsync());
+            var registeredCardsList = appDbContext.Where(s => s.RegisteredDate != null);
+            var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null);
+
+            switch (regSortOrder)
+            {
+                case "desc":
+                    registeredCardsList = registeredCardsList.OrderByDescending(s => s.RegisteredDate);
+                    break;
+                case "asc":
+                    registeredCardsList = registeredCardsList.OrderBy(s => s.RegisteredDate);
+                    break;
+                default:
+                    registeredCardsList = registeredCardsList.OrderBy(s => s.RegisteredDate);
+                    break;
+            }
+
+            switch(crSortOrder)
+            {
+                case "desc":
+                    notRegisteredCardsList = notRegisteredCardsList.OrderByDescending(s => s.CreatedDate);
+                    break;
+                case "asc":
+                    notRegisteredCardsList = notRegisteredCardsList.OrderBy(s => s.CreatedDate);
+                    break;
+                default:
+                    notRegisteredCardsList = notRegisteredCardsList.OrderBy(s => s.CreatedDate);
+                    break;
+            }
+            UserCardsBox box = new UserCardsBox();
+            box.RegisteredCards = registeredCardsList.ToList();
+            box.NotRegisteredCards = notRegisteredCardsList.ToList();
+            return View(box);
         }
 
         // GET: Cards/Details/5
