@@ -1,4 +1,4 @@
-@model WebUI.Models.UserCardsBox
+﻿@model WebUI.Models.UserCardsBox
 @{
     ViewData["Title"] = "Index";
     bool isAdmin = ViewData["isAdmin"] == null ? false : (bool)ViewData["isAdmin"];
@@ -12,7 +12,7 @@
 @using (Html.BeginForm())
 {
     <div>
-        @Html.TextBox("Regnumber", null, new { placeholder = "Reg number" })
+        @Html.TextBox("Regnumber", null, new { placeholder = "Регистрационный номер" })
 
         @Html.TextBox("VIN", "", new { placeholder = "VIN" })
 
@@ -121,7 +121,7 @@
                 @if (isAdmin)
                 {
                     <th>
-                        @Html.DisplayNameFor(model => notRegModel.User)
+                        @Html.DisplayNameFor(model => notRegModel.UserId)
                     </th>
                 }
 
@@ -218,29 +218,13 @@
                         @Html.DisplayFor(modelItem => item.ExpirationDate)
                     </td>
                     <td>
-                        @{
-                            if (isAdmin)
-                            {
-                                SortParamEnum SortParamCurrentUser = (SortParamEnum)ViewData["SortParamTable2"];
-                                SortParamEnum SortByUser = SortParamCurrentUser;
-                                switch (SortParamCurrentUser)
-                                {
-                                    case SortParamEnum.User_ASC:
-                                        SortByUser = SortParamEnum.User_DESC;
-                                        break;
-                                    case SortParamEnum.User_DESC:
-                                        SortByUser = SortParamEnum.User_ASC;
-                                        break;
-                                    default:
-                                        SortByUser = SortParamEnum.User_ASC;
-                                        break;
-                                };
-                            <th>
-                                @Html.ActionLink(Html.DisplayNameFor(model => notRegModel.UserId), "Index", "Cards", new { sortParamTable2 = SortByUser });
-                            </th>
-
-                            }
+                        @if (isAdmin)
+                        {
+                        <th>
+                            @Html.DisplayFor(modelItem => item.UserId)
+                        </th>
                         }
+
                         </td>
                         <td>
                             <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
@@ -248,9 +232,9 @@
                             <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                         </td>
                     </tr>
-                            }
+            }
         </tbody>
-                            }
+    }
 
 </table>
 
@@ -382,7 +366,7 @@
                                 break;
                         };
                         <th>
-                            @Html.ActionLink(Html.DisplayNameFor(model => regModel.UserId), "Index", "Cards", new { sortParamTable2 = SortByUser });
+                            @Html.ActionLink(Html.DisplayNameFor(model => regModel.UserId), "Index", "Cards", new { sortParamTable2 = SortByUser })
                         </th>
 
                     }
@@ -480,9 +464,9 @@
                     </td>
                     @if (isAdmin)
                     {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.User.Id)
-                    </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserId)
+                        </td>
                     }
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a>
