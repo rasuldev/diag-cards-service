@@ -33,13 +33,9 @@ namespace WebUI.Controllers
             string Regnumber, string VIN, string FIO, DateTime StartDate, DateTime EndDate)
         {
             var UserId = _userManager.GetUserId(User);
-            //var UserType = this.User.Identity.AuthenticationType;
-            var isAdmin = User.IsInRole("admin");
+            var isAdmin = User.IsInRole(UserRoles.Admin);
             ViewData["SortParamTable2"] = sortParamTable2;
             ViewData["isAdmin"] = isAdmin;
-
-            //if (isAdmin)
-            //    ViewData["UserDateSortParameter"] = String.IsNullOrEmpty(userSortOrder) ? "desc" : "asc";
 
             var appDbContext = isAdmin
                 ? _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId != null)
@@ -72,9 +68,12 @@ namespace WebUI.Controllers
                 appDbContext = appDbContext.Where(item => item.VIN.Contains(VIN));
             //--- Filter
 
+            // Split to 2 list registered and not registered items
             var registeredCardsList = appDbContext.Where(s => s.RegisteredDate != null);
             var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null);
+            //--- Split to 2 list registered and not registered items
 
+            // Sort
             switch (sortParamTable2)
             {
                 case SortParamEnum.RegistrationDate_ASC:
@@ -95,6 +94,7 @@ namespace WebUI.Controllers
                     registeredCardsList = registeredCardsList.OrderBy(s => s.CardId);
                     break;
             }
+            //--- Sort
 
 
             UserCardsBox box = new UserCardsBox();
