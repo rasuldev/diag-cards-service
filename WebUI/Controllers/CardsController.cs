@@ -22,12 +22,40 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards
-        public async Task<IActionResult> Index(string crSortOrder, string regSortOrder)
+        public async Task<IActionResult> Index(string crSortOrder, string regSortOrder,
+            string Regnumber, string VIN, string FIO, DateTime StartDate, DateTime EndDate)
         {
             ViewData["CreateDateSortParm"] = String.IsNullOrEmpty(crSortOrder) ? "desc" : "asc";
             ViewData["RegDateSortParm"] = String.IsNullOrEmpty(regSortOrder) ? "desc" : "asc";
+            var appDbContext = _context.DiagnosticCards.Include(d => d.User).Where(item => item.CardId.Length > 0);
 
-            var appDbContext = _context.DiagnosticCards.Include(d => d.User);
+            // Filter
+            if (FIO != null && FIO != "")
+            {
+                string name = "", lastname = "", patronymic = "";
+                var arr = FIO.Split(' ');
+                if (arr.Length > 0)
+                    lastname = arr[0];
+                if (arr.Length > 1)
+                    name = arr[1];
+                if (arr.Length > 2)
+                    patronymic = arr[2];
+                appDbContext = appDbContext.Where(item => item.Lastname.StartsWith(lastname))
+                .Where(item => item.Firstname.StartsWith(name))
+                .Where(item => item.Patronymic.StartsWith(patronymic));
+            }
+            if (StartDate != null && EndDate != null)
+            {
+                if (EndDate == new DateTime(1, 1, 1))
+                    EndDate = DateTime.Now;
+                appDbContext = appDbContext.Where(item => item.CreatedDate > StartDate && item.CreatedDate < EndDate);
+            }
+            if (Regnumber != null && Regnumber != "")
+                appDbContext = appDbContext.Where(item => item.RegNumber.Contains(Regnumber));
+            if (VIN != null && VIN != "")
+                appDbContext = appDbContext.Where(item => item.VIN.Contains(VIN));
+            //--- Filter
+
             var registeredCardsList = appDbContext.Where(s => s.RegisteredDate != null);
             var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null);
 
@@ -44,7 +72,7 @@ namespace WebUI.Controllers
                     break;
             }
 
-            switch(crSortOrder)
+            switch (crSortOrder)
             {
                 case "desc":
                     notRegisteredCardsList = notRegisteredCardsList.OrderByDescending(s => s.CreatedDate);
