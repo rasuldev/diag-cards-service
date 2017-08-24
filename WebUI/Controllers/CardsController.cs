@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using WebUI.Data.Entities;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Routing;
 
 namespace WebUI.Controllers
 {
@@ -136,8 +137,13 @@ namespace WebUI.Controllers
                 var diagnosticCard = _context.DiagnosticCards
                 .Include(d => d.User)
                 .SingleOrDefault(m => m.Id == Id);
-                diagnosticCard.CreatedDate = DateTime.Now;
-                return View(diagnosticCard);
+                if (diagnosticCard != null && diagnosticCard.RegisteredDate != null)
+                {
+                    diagnosticCard.CreatedDate = DateTime.Now;
+                    return View(diagnosticCard);
+                }
+                else
+                    return RedirectToAction("Index", "Cards");
             }
             return View();
         }
