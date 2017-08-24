@@ -16,6 +16,7 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using WebUI.Data;
 using WebUI.Data.Entities;
+using WebUI.Infrastructure.Pagination;
 using WebUI.Models;
 using WebUI.Services;
 
@@ -62,6 +63,8 @@ namespace WebUI
             })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
+
+            services.AddPager();
 
             services.AddMvc();
 
