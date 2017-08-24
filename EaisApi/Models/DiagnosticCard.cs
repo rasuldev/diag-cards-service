@@ -8,7 +8,7 @@ namespace EaisApi.Models
     {
         [MaxLength(30)]
         public string CardId { get; set; }
-        [Required, Display(Name="Фамилия"), MaxLength(30)]
+        [Required, Display(Name = "Фамилия"), MaxLength(30)]
         public string Lastname { get; set; }
         [Required, Display(Name = "Имя"), MaxLength(30)]
         public string Firstname { get; set; }
@@ -16,7 +16,7 @@ namespace EaisApi.Models
         public string Patronymic { get; set; }
         [StringLength(17), Display(Name = "ВИН")]
         public string VIN { get; set; }
-        [Required, Display(Name="Год выпуска ТС")]
+        [Required, Display(Name = "Год выпуска ТС")]
         public int IssueYear { get; set; }
 
         /// <summary>
@@ -31,15 +31,15 @@ namespace EaisApi.Models
         [Required, Display(Name = "Модель ТС"), MaxLength(30)]
         public string Model { get; set; }
 
-        [Display(Name="Кузов №"), MaxLength(50)]
+        [Display(Name = "Кузов №"), MaxLength(50)]
         public string BodyNumber { get; set; }
-        [Display(Name="Рама (Шасси) №"), MaxLength(50)]
+        [Display(Name = "Рама (Шасси) №"), MaxLength(50)]
         public string FrameNumber { get; set; }
-        [Display(Name="Пробег ТС (км)"), Range(100, int.MaxValue)]
+        [Display(Name = "Пробег ТС (км)"), Range(100, int.MaxValue)]
         public int Running { get; set; }
         [Display(Name = "Государственный регистрационный знак"), MaxLength(10)]
         public string RegNumber { get; set; }
-        
+
         /// <summary>
         /// Масса без нагрузки (кг)
         /// </summary>
@@ -77,6 +77,7 @@ namespace EaisApi.Models
         public string DocumentSeries { get; set; }
         [Required, Display(Name = "Номер"), StringLength(6)]
         public string DocumentNumber { get; set; }
+        [DataType(DataType.Date)]
         [Required, Display(Name = "Дата выдачи")]
         public DateTime DocumentIssueDate { get; set; }
         [Required, Display(Name = "Выдан кем"), MaxLength(50)]
@@ -85,6 +86,7 @@ namespace EaisApi.Models
         [Display(Name = "Примечание"), MaxLength(250)]
         public string Note { get; set; }
 
+        [DataType(DataType.Date)]
         [Display(Name = "Срок действия")]
         public DateTime ExpirationDate { get; set; }
     }
