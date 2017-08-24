@@ -21,6 +21,7 @@ namespace WebUI.Controllers
     {
         private readonly AppDbContext _context;
         UserManager<User> _userManager;
+        bool isAdmin;
 
         public CardsController(AppDbContext context, UserManager<User> userManager)
         {
@@ -29,12 +30,12 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards
-        public async Task<IActionResult> Index(SortParamEnum sortParamTable2,
-            string Regnumber, string VIN, string FIO, DateTime StartDate, DateTime EndDate)
+        public async Task<IActionResult> Index(SortParamEnum sortBy,
+            string Regnumber, string VIN, string FIO, DateTime? StartDate, DateTime? EndDate)
         {
             var UserId = _userManager.GetUserId(User);
-            var isAdmin = User.IsInRole(UserRoles.Admin);
-            ViewData["SortParamTable2"] = sortParamTable2;
+            isAdmin = User.IsInRole(UserRoles.Admin);
+            ViewData["SortParamTable2"] = sortBy;
             ViewData["isAdmin"] = isAdmin;
 
             var appDbContext = isAdmin
@@ -56,12 +57,11 @@ namespace WebUI.Controllers
                 .Where(item => item.Firstname.StartsWith(name))
                 .Where(item => item.Patronymic.StartsWith(patronymic));
             }
-            if (StartDate != null && EndDate != null)
-            {
-                if (EndDate == new DateTime(1, 1, 1))
-                    EndDate = DateTime.Now;
-                appDbContext = appDbContext.Where(item => item.CreatedDate > StartDate && item.CreatedDate < EndDate);
-            }
+            if (StartDate != null)
+                appDbContext = appDbContext.Where(item => item.CreatedDate > StartDate);
+            if (EndDate != null)
+                appDbContext = appDbContext.Where(item => item.CreatedDate < EndDate);
+
             if (Regnumber != null && Regnumber != "")
                 appDbContext = appDbContext.Where(item => item.RegNumber.Contains(Regnumber));
             if (VIN != null && VIN != "")
@@ -73,35 +73,39 @@ namespace WebUI.Controllers
             var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null);
             //--- Split to 2 list registered and not registered items
 
-            // Sort
-            switch (sortParamTable2)
+
+            UserCardsBox box = new UserCardsBox();
+            box.RegisteredCards = SortList(registeredCardsList, sortBy);
+            box.NotRegisteredCards = SortList(notRegisteredCardsList, sortBy);
+            return View(box);
+        }
+
+        public List<DiagnosticCard> SortList(IQueryable<DiagnosticCard> list, SortParamEnum sortBy)
+        {
+            var resultList = new List<DiagnosticCard>();
+            switch (sortBy)
             {
                 case SortParamEnum.RegistrationDate_ASC:
-                    registeredCardsList = registeredCardsList.OrderBy(s => s.RegisteredDate);
+                    resultList = list.OrderBy(s => s.RegisteredDate).ToList();
                     break;
                 case SortParamEnum.RegistrationDate_DESC:
-                    registeredCardsList = registeredCardsList.OrderByDescending(s => s.RegisteredDate);
+                    resultList = list.OrderByDescending(s => s.RegisteredDate).ToList();
                     break;
                 case SortParamEnum.User_ASC:
                     if (isAdmin)
-                        registeredCardsList = registeredCardsList.OrderBy(s => s.User);
+                        resultList = list.OrderBy(s => s.User).ToList();
                     break;
                 case SortParamEnum.User_DESC:
                     if (isAdmin)
-                        registeredCardsList = registeredCardsList.OrderByDescending(s => s.User);
+                        resultList = list.OrderByDescending(s => s.User).ToList();
                     break;
                 default:
-                    registeredCardsList = registeredCardsList.OrderBy(s => s.CardId);
+                    resultList = list.OrderBy(s => s.CardId).ToList();
                     break;
             }
-            //--- Sort
-
-
-            UserCardsBox box = new UserCardsBox();
-            box.RegisteredCards = registeredCardsList.ToList();
-            box.NotRegisteredCards = notRegisteredCardsList.ToList();
-            return View(box);
+            return resultList;
         }
+
 
         // GET: Cards/Details/5
         public async Task<IActionResult> Details(int? id)
