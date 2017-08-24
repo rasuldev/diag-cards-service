@@ -9,12 +9,18 @@ using Microsoft.EntityFrameworkCore;
 using WebUI.Data;
 using DiagnosticCard = WebUI.Data.Entities.DiagnosticCard;
 using WebUI.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using WebUI.Data.Entities;
+using System.Security.Claims;
 
 namespace WebUI.Controllers
 {
+    [Authorize]
     public class CardsController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<User> _userManager;
 
         public CardsController(AppDbContext context)
         {
@@ -25,9 +31,11 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Index(string crSortOrder, string regSortOrder,
             string Regnumber, string VIN, string FIO, DateTime StartDate, DateTime EndDate)
         {
+            var UserId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             ViewData["CreateDateSortParm"] = String.IsNullOrEmpty(crSortOrder) ? "desc" : "asc";
             ViewData["RegDateSortParm"] = String.IsNullOrEmpty(regSortOrder) ? "desc" : "asc";
-            var appDbContext = _context.DiagnosticCards.Include(d => d.User).Where(item => item.CardId.Length > 0);
+            var appDbContext = _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId.Equals(UserId));
 
             // Filter
             if (FIO != null && FIO != "")
