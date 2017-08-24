@@ -127,10 +127,18 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards/Create
-        public IActionResult Create()
+        public IActionResult Create(int? Id)
         {
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             CreateOrEditInit();
+            if (Id != null)
+            {
+                var diagnosticCard = _context.DiagnosticCards
+                .Include(d => d.User)
+                .SingleOrDefault(m => m.Id == Id);
+                diagnosticCard.CreatedDate = DateTime.Now;
+                return View(diagnosticCard);
+            }
             return View();
         }
 
@@ -143,12 +151,16 @@ namespace WebUI.Controllers
         {
             if (ModelState.IsValid)
             {
-                diagnosticCard.RegisteredDate = DateTime.Now;
+                diagnosticCard.Id = 0;
+                diagnosticCard.UserId = _userManager.GetUserId(User);
+                diagnosticCard.CardId = null;
+                diagnosticCard.RegisteredDate = null;
+
                 _context.Add(diagnosticCard);
-                await _context.SaveChangesAsync();
+                var f = await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", diagnosticCard.UserId);
+
             CreateOrEditInit();
             return View(diagnosticCard);
         }
