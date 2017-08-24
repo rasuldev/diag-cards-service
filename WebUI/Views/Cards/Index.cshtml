@@ -1,33 +1,33 @@
 ﻿@model WebUI.Models.UserCardsBox
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Список карт";
     bool isAdmin = ViewData["isAdmin"] == null ? false : (bool)ViewData["isAdmin"];
 }
 <meta charset="utf-8">
-<h2>Index</h2>
+<h2>@ViewData["Title"]</h2>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Добавить новую карту</a>
 </p>
 @using (Html.BeginForm())
 {
-    <div>
-        @Html.TextBox("Regnumber", null, new { placeholder = "Регистрационный номер" })
+    <div class="form-inline">
+        @Html.TextBox("Regnumber", null, new { placeholder = "Регистрационный номер", @class = "form-control" })
 
-        @Html.TextBox("VIN", "", new { placeholder = "VIN" })
+        @Html.TextBox("VIN", null, new { placeholder = "VIN", @class = "form-control" })
 
-        @Html.TextBox("FIO", "", new { placeholder = "FIO" })
+        @Html.TextBox("FIO", null, new { placeholder = "ФИО", @class = "form-control" })
 
-        @Html.TextBox("StartDate", "", new { type = "date", placeholder = "Create date: from", @class = "datefield" })
+        @Html.TextBox("StartDate", null, new { type = "date", placeholder = "Дата создания: от", @class = "form-control" })
 
-        @Html.TextBox("EndDate", "", new { type = "date", placeholder = "Create date: to", @class = "datefield" })
+        @Html.TextBox("EndDate", null, new { type = "date", placeholder = "Дата создания: до", @class = "form-control" })
 
-        <input type="submit" value="Search" />
+        <button type="submit" class="btn btn-warning">Поиск</button>
     </div>
 }
 
 @* For not registered cards*@
-<table class="table">
+<table class="table table-striped">
     @if (Model.NotRegisteredCards.Count > 0)
     {
         var notRegModel = Model.NotRegisteredCards[0];
@@ -227,9 +227,15 @@
 
                         </td>
                         <td>
-                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn btn-primary">Изменить</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Детали</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Удалить</a>
+                            <style>
+                                .action-btn {
+                                    width: 100%;
+                                    margin-bottom: 5px;
+                                }
+                            </style>
                         </td>
                     </tr>
             }
@@ -239,7 +245,7 @@
 </table>
 
 @* For registered cards*@
-<table class="table">
+<table class="table table-striped">
     @if (Model.RegisteredCards.Count > 0)
     {
         var regModel = Model.RegisteredCards[0];
@@ -469,7 +475,7 @@
                         </td>
                     }
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Детали</a>
                     </td>
                 </tr>
             }

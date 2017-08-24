@@ -5,7 +5,7 @@
 }
 
 <h2>Details</h2>
-
+<meta charset="utf-8">
 <div>
     <h4>DiagnosticCard</h4>
     <hr />
@@ -181,6 +181,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" class="btn btn-default">Назад к списку</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="action-btn btn btn-primary">Изменить</a>
 </div>
