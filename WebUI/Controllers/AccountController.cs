@@ -12,6 +12,8 @@ using Microsoft.Extensions.Options;
 using WebUI.Data.Entities;
 using WebUI.Models.AccountViewModels;
 using WebUI.Services;
+using Microsoft.Extensions.Configuration;
+using WebUI.Models;
 
 namespace WebUI.Controllers
 {
@@ -96,10 +98,29 @@ namespace WebUI.Controllers
         // GET: /Account/Register
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Register(string returnUrl = null)
+        public async Task<IActionResult> Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            //await CreateAdminUser();
             return View();
+        }
+
+
+        private async Task CreateAdminUser()
+        {
+            var username = "admin@admin.ru";
+            var pass = "123456";
+            var user = new User { UserName = username /*, Email = model.Email */};
+            var admin = await _userManager.FindByNameAsync(username);
+            //await _userManager.DeleteAsync(admin);
+            //admin = await _userManager.FindByNameAsync(username);
+            if (admin == null)
+            {
+                //var result = await _roleManager.CreateAsync(new IdentityRole("Administrator"));                
+                var f = await _userManager.CreateAsync(user, pass);
+                await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, UserRoles.Admin, ClaimValueTypes.String));
+                //await _userManager.AddToRoleAsync(user, "Administrator");
+            }
         }
 
         //
@@ -122,6 +143,7 @@ namespace WebUI.Controllers
                     //var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
                     //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
                     //    $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                    await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, UserRoles.Local, ClaimValueTypes.String));
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation(3, "User created a new account with password.");
                     return RedirectToLocal(returnUrl);
