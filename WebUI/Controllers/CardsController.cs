@@ -20,18 +20,20 @@ namespace WebUI.Controllers
     public class CardsController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly UserManager<User> _userManager;
+        UserManager<User> _userManager;
 
-        public CardsController(AppDbContext context)
+        public CardsController(AppDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Cards
         public async Task<IActionResult> Index(string crSortOrder, string regSortOrder,
             string Regnumber, string VIN, string FIO, DateTime StartDate, DateTime EndDate)
         {
-            var UserId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var UserId = _userManager.GetUserId(User);
+            //var UserType = this.User.Identity.AuthenticationType;
 
             ViewData["CreateDateSortParm"] = String.IsNullOrEmpty(crSortOrder) ? "desc" : "asc";
             ViewData["RegDateSortParm"] = String.IsNullOrEmpty(regSortOrder) ? "desc" : "asc";
