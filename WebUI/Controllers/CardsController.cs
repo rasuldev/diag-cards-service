@@ -29,15 +29,21 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards
-        public async Task<IActionResult> Index(string crSortOrder, string regSortOrder,
+        public async Task<IActionResult> Index(SortParamEnum sortParamTable2,
             string Regnumber, string VIN, string FIO, DateTime StartDate, DateTime EndDate)
         {
             var UserId = _userManager.GetUserId(User);
             //var UserType = this.User.Identity.AuthenticationType;
+            var isAdmin = User.IsInRole("admin");
+            ViewData["SortParamTable2"] = sortParamTable2;
+            ViewData["isAdmin"] = isAdmin;
 
-            ViewData["CreateDateSortParm"] = String.IsNullOrEmpty(crSortOrder) ? "desc" : "asc";
-            ViewData["RegDateSortParm"] = String.IsNullOrEmpty(regSortOrder) ? "desc" : "asc";
-            var appDbContext = _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId.Equals(UserId));
+            //if (isAdmin)
+            //    ViewData["UserDateSortParameter"] = String.IsNullOrEmpty(userSortOrder) ? "desc" : "asc";
+
+            var appDbContext = isAdmin
+                ? _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId != null)
+                : _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId.Equals(UserId));
 
             // Filter
             if (FIO != null && FIO != "")
@@ -69,31 +75,28 @@ namespace WebUI.Controllers
             var registeredCardsList = appDbContext.Where(s => s.RegisteredDate != null);
             var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null);
 
-            switch (regSortOrder)
+            switch (sortParamTable2)
             {
-                case "desc":
+                case SortParamEnum.RegistrationDate_ASC:
+                    registeredCardsList = registeredCardsList.OrderBy(s => s.RegisteredDate);
+                    break;
+                case SortParamEnum.RegistrationDate_DESC:
                     registeredCardsList = registeredCardsList.OrderByDescending(s => s.RegisteredDate);
                     break;
-                case "asc":
-                    registeredCardsList = registeredCardsList.OrderBy(s => s.RegisteredDate);
+                case SortParamEnum.User_ASC:
+                    if (isAdmin)
+                        registeredCardsList = registeredCardsList.OrderBy(s => s.User);
+                    break;
+                case SortParamEnum.User_DESC:
+                    if (isAdmin)
+                        registeredCardsList = registeredCardsList.OrderByDescending(s => s.User);
                     break;
                 default:
-                    registeredCardsList = registeredCardsList.OrderBy(s => s.RegisteredDate);
+                    registeredCardsList = registeredCardsList.OrderBy(s => s.CardId);
                     break;
             }
 
-            switch (crSortOrder)
-            {
-                case "desc":
-                    notRegisteredCardsList = notRegisteredCardsList.OrderByDescending(s => s.CreatedDate);
-                    break;
-                case "asc":
-                    notRegisteredCardsList = notRegisteredCardsList.OrderBy(s => s.CreatedDate);
-                    break;
-                default:
-                    notRegisteredCardsList = notRegisteredCardsList.OrderBy(s => s.CreatedDate);
-                    break;
-            }
+
             UserCardsBox box = new UserCardsBox();
             box.RegisteredCards = registeredCardsList.ToList();
             box.NotRegisteredCards = notRegisteredCardsList.ToList();
@@ -136,6 +139,7 @@ namespace WebUI.Controllers
         {
             if (ModelState.IsValid)
             {
+                diagnosticCard.RegisteredDate = DateTime.Now;
                 _context.Add(diagnosticCard);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
@@ -159,6 +163,8 @@ namespace WebUI.Controllers
             {
                 return NotFound();
             }
+            if (diagnosticCard.RegisteredDate != null)
+                return RedirectToAction("Index");
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", diagnosticCard.UserId);
             return View(diagnosticCard);
         }
@@ -211,10 +217,14 @@ namespace WebUI.Controllers
             var diagnosticCard = await _context.DiagnosticCards
                 .Include(d => d.User)
                 .SingleOrDefaultAsync(m => m.Id == id);
+
             if (diagnosticCard == null)
             {
                 return NotFound();
             }
+            if (diagnosticCard.RegisteredDate != null)
+                return RedirectToAction("Index");
+
 
             return View(diagnosticCard);
         }
