@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using WebUI.Data.Entities;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Routing;
+using WebUI.Infrastructure.Pagination;
 
 namespace WebUI.Controllers
 {
@@ -23,17 +24,22 @@ namespace WebUI.Controllers
         private readonly AppDbContext _context;
         UserManager<User> _userManager;
         bool isAdmin;
+        private readonly Pager _pager;
 
-        public CardsController(AppDbContext context, UserManager<User> userManager)
+
+        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager)
         {
             _context = context;
             _userManager = userManager;
+            _pager = pager;
         }
 
         // GET: Cards
         public async Task<IActionResult> Index(SortParamEnum sortBy,
             string Regnumber, string VIN, string FIO, DateTime? StartDate, DateTime? EndDate, CardStatusEnum? filter)
         {
+            var page = _pager.CurrentPage;
+
             if (filter == null)
             {
                 if (ViewData["Filter"] == null)
@@ -81,24 +87,27 @@ namespace WebUI.Controllers
             //--- Filter
 
             // Split to 2 list registered and not registered items
-            var registeredCardsList = appDbContext.Where(s => s.RegisteredDate != null);
-            var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null);
+            var registeredCardsList = appDbContext.Where(s => s.RegisteredDate != null).ToList();
+            var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null).ToList();
             //--- Split to 2 list registered and not registered items
+
+            ViewData["RegCardsCount"] = registeredCardsList.Count;
+            ViewData["NotRegCardsCount"] = notRegisteredCardsList.Count;
 
             UserCardsBox box = new UserCardsBox();
             switch (filter)
             {
                 case CardStatusEnum.Registered:
-                    box.RegisteredCards = SortList(registeredCardsList, sortBy);
+                    box.RegisteredCards = SortList(registeredCardsList, sortBy).Skip(10 * (page - 1)).Take(10).ToList();
                     break;
                 case CardStatusEnum.Unregistered:
-                    box.NotRegisteredCards = SortList(notRegisteredCardsList, sortBy);
+                    box.NotRegisteredCards = SortList(notRegisteredCardsList, sortBy).Skip(10 * (page - 1)).Take(10).ToList();
                     break;
             }
             return View(box);
         }
 
-        public List<DiagnosticCard> SortList(IQueryable<DiagnosticCard> list, SortParamEnum sortBy)
+        public List<DiagnosticCard> SortList(List<DiagnosticCard> list, SortParamEnum sortBy)
         {
             var resultList = new List<DiagnosticCard>();
             switch (sortBy)
@@ -116,6 +125,9 @@ namespace WebUI.Controllers
                 case SortParamEnum.User_DESC:
                     if (isAdmin)
                         resultList = list.OrderByDescending(s => s.User).ToList();
+                    break;
+                case SortParamEnum.CreationDate_ASC:
+                    resultList = list.OrderBy(s => s.CreatedDate).ToList();
                     break;
                 default:
                     resultList = list.OrderBy(s => s.CardId).ToList();
