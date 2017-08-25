@@ -46,7 +46,7 @@ namespace WebUI.Controllers
                         .Where(users => users.IsRemoved.Equals(true))
                         .ToListAsync());
                 default:
-                    return View(await _context.User.ToListAsync());
+                    return View(await _context.User.Where(user => user.IsRemoved == false).ToListAsync());
             }
         }
 
