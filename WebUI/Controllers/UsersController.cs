@@ -187,6 +187,38 @@ namespace WebUI.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> Accept(string id)
+        {
+            if (UserExists(id))
+            {
+                var user = await _context.User.SingleOrDefaultAsync(m => m.Id == id);
+                if (!user.IsRemoved)
+                {
+                    user.IsApproved = true;
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Reject(string id)
+        {
+            if (UserExists(id))
+            {
+                var user = await _context.User.SingleOrDefaultAsync(m => m.Id == id);
+                if (!user.IsRemoved)
+                {
+                    user.IsApproved = false;
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+
         private bool UserExists(string id)
         {
             return _context.User.Any(e => e.Id == id);
