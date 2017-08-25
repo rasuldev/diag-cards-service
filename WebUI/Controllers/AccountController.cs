@@ -149,7 +149,6 @@ namespace WebUI.Controllers
                     //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
                     //    $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
                     await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, UserRoles.Local, ClaimValueTypes.String));
-                    await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation(3, "User created a new account with password.");
                     return RedirectToLocal(returnUrl);
                 }
