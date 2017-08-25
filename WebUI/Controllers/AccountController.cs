@@ -70,7 +70,9 @@ namespace WebUI.Controllers
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var user = await _userManager.FindByNameAsync(model.Email);
                 if (user.IsRemoved)
-                    return View("Lockout");
+                    return View("Banned");
+                if (user.IsApproved != true)
+                    return View("NotApproval");
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
