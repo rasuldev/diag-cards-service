@@ -32,12 +32,23 @@ namespace WebUI.Controllers
 
         // GET: Cards
         public async Task<IActionResult> Index(SortParamEnum sortBy,
-            string Regnumber, string VIN, string FIO, DateTime? StartDate, DateTime? EndDate)
+            string Regnumber, string VIN, string FIO, DateTime? StartDate, DateTime? EndDate, CardStatusEnum? filter)
         {
+            if (filter == null)
+            {
+                if (ViewData["Filter"] == null)
+                    ViewData["Filter"] = CardStatusEnum.Unregistered;
+                filter = (CardStatusEnum)ViewData["Filter"];
+            }
+            else
+                ViewData["Filter"] = filter;
+
+
             var UserId = _userManager.GetUserId(User);
             isAdmin = User.IsInRole(UserRoles.Admin);
             ViewData["SortParamTable2"] = sortBy;
             ViewData["isAdmin"] = isAdmin;
+            ViewData["CardStatusEnum"] = new SelectList(Enum.GetValues(typeof(CardStatusEnum)).Cast<CardStatusEnum>().ToList(), filter);
 
             var appDbContext = isAdmin
                 ? _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId != null)
@@ -74,10 +85,16 @@ namespace WebUI.Controllers
             var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null);
             //--- Split to 2 list registered and not registered items
 
-
             UserCardsBox box = new UserCardsBox();
-            box.RegisteredCards = SortList(registeredCardsList, sortBy);
-            box.NotRegisteredCards = SortList(notRegisteredCardsList, sortBy);
+            switch (filter)
+            {
+                case CardStatusEnum.Registered:
+                    box.RegisteredCards = SortList(registeredCardsList, sortBy);
+                    break;
+                case CardStatusEnum.Unregistered:
+                    box.NotRegisteredCards = SortList(notRegisteredCardsList, sortBy);
+                    break;
+            }
             return View(box);
         }
 

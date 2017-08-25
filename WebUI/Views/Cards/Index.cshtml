@@ -22,13 +22,15 @@
 
         @Html.TextBox("EndDate", null, new { type = "date", placeholder = "Дата создания: до", @class = "form-control" })
 
+        <select asp-items="ViewBag.CardStatusEnum" class="form-control" name="filter"></select>
+
         <button type="submit" class="btn btn-warning">Поиск</button>
     </div>
 }
 
 @* For not registered cards*@
 <table class="table table-striped">
-    @if (Model.NotRegisteredCards.Count > 0)
+    @if (Model.NotRegisteredCards != null && Model.NotRegisteredCards.Count > 0)
     {
         var notRegModel = Model.NotRegisteredCards[0];
 
@@ -240,7 +242,7 @@
 
 @* For registered cards*@
 <table class="table table-striped">
-    @if (Model.RegisteredCards.Count > 0)
+    @if (Model.RegisteredCards != null && Model.RegisteredCards.Count > 0)
     {
         var regModel = Model.RegisteredCards[0];
         <thead>
@@ -251,21 +253,11 @@
                 <th>
                     @{
                         SortParamEnum SortParamCurrentDate = (SortParamEnum)ViewData["SortParamTable2"];
-                        SortParamEnum SortByDate = SortParamCurrentDate;
-                        switch (SortParamCurrentDate)
-                        {
-                            case SortParamEnum.RegistrationDate_ASC:
-                                SortByDate = SortParamEnum.RegistrationDate_DESC;
-                                break;
-                            case SortParamEnum.RegistrationDate_DESC:
-                                SortByDate = SortParamEnum.RegistrationDate_ASC;
-                                break;
-                            default:
-                                SortByDate = SortParamEnum.RegistrationDate_ASC;
-                                break;
-                        };
-
-                        @Html.ActionLink(Html.DisplayNameFor(model => regModel.RegisteredDate), "Index", "Cards", new { sortParamTable2 = SortByDate });
+                        @Html.ActionLink(Html.DisplayNameFor(model => regModel.RegisteredDate), "Index", "Cards", new
+                   {
+                       sortBy = SortParamCurrentDate == SortParamEnum.RegistrationDate_ASC ? SortParamEnum.RegistrationDate_DESC : SortParamEnum.RegistrationDate_ASC,
+                       filter = ViewData["Filter"]
+                   });
                     }
                 </th>
                 <th>
