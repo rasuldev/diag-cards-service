@@ -36,6 +36,8 @@ namespace WebUI.Data
             builder.Entity<DiagnosticCard>().HasIndex(e => e.FrameNumber);
         }
 
+        public DbSet<WebUI.Data.Entities.User> User { get; set; }
+
 
     }
 }
