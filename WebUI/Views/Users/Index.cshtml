@@ -65,18 +65,18 @@
                     }
                 }
             }
-            <tr class="@trStatus">
-                <td>
-                    <button class="btn-strong btn btn-@trStatus">@textStatus</button>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UserName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td style="text-align:center;">
-                    @if (item.EmailConfirmed)
+        <tr class="@trStatus">
+            <td>
+                <button class="btn-strong btn btn-@trStatus">@textStatus</button>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td style="text-align:center;">
+                @if (item.EmailConfirmed)
                     {
                     <text>
                     <button class="btn-strong-small btn btn-success">Verified</button>
@@ -89,37 +89,38 @@
                     <button class="btn-strong-small btn btn-warning">Unverified</button>
                     </text>
                     }
-                </td>
-                <td>
-                    <div class="form-inline">
-                        @switch (trStatus)
+            </td>
+            <td>
+                <div class="form-inline">
+                    @switch (trStatus)
                         {
                             case "danger": // deleted user
-                                <a asp-action="Restore" asp-route-id="@item.Id" class="action-btn btn btn-info">Restore</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
+                        <a asp-action="Restore" asp-route-id="@item.Id" class="action-btn btn btn-info">Restore</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
                                 break;
                             case "success":// accepted user
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn btn-primary">Edit</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Delete</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn btn-primary">Edit</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Delete</a>
                                 break;
                             case "info":// waiting user
-                                <a asp-action="Accept" asp-route-id="@item.Id" class="action-btn btn btn-success">Accept</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
-                                <a asp-action="Reject" asp-route-id="@item.Id" class="action-btn btn btn-warning">Reject</a>
+                        <a asp-action="Accept" asp-route-id="@item.Id" class="action-btn btn btn-success">Accept</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
+                        <a asp-action="Reject" asp-route-id="@item.Id" class="action-btn btn btn-warning">Reject</a>
                                 break;
                             case "warning":// rejected user
-                                <a asp-action="Accept" asp-route-id="@item.Id" class="action-btn btn btn-success">Accept</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Delete</a>
+                        <a asp-action="Accept" asp-route-id="@item.Id" class="action-btn btn btn-success">Accept</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Delete</a>
                                 break;
                         }
-                    </div>
-                </td>
-            </tr>
+                </div>
+            </td>
+        </tr>
         }
     </tbody>
 </table>
+@Html.PagerLinks(totalCount: (int)ViewData["UsersCount"], pageSize: 10, visiblePagesCount: 10)
 
 <style>
     .btn-strong {
