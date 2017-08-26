@@ -39,28 +39,22 @@ namespace WebUI.Controllers
             string Regnumber, string VIN, string FIO, DateTime? StartDate, DateTime? EndDate, CardStatusEnum? filter)
         {
             var page = _pager.CurrentPage;
+            var UserId = _userManager.GetUserId(User);
+            isAdmin = User.IsInRole(UserRoles.Admin);
 
             if (filter == null)
             {
-                if (ViewData["Filter"] == null)
-                    ViewData["Filter"] = CardStatusEnum.Unregistered;
-                filter = (CardStatusEnum)ViewData["Filter"];
+                if (TempData["FilterCard"] == null)
+                    filter = CardStatusEnum.Registered;
+                else
+                    filter = (CardStatusEnum)TempData["FilterCard"];
             }
-            else
-                ViewData["Filter"] = filter;
 
-
-            var UserId = _userManager.GetUserId(User);
-            isAdmin = User.IsInRole(UserRoles.Admin);
-            ViewData["SortParamTable2"] = sortBy;
-            ViewData["isAdmin"] = isAdmin;
-            SelectList selectList = new SelectList(
-                new List<SelectListItem>
-                {
-                    new SelectListItem {Text = "Registered", Value = "0", Selected = filter.Equals(CardStatusEnum.Registered)},
-                    new SelectListItem {Text = "Unregistered", Value = "1", Selected = filter.Equals(CardStatusEnum.Unregistered)},
-                }, "Value", "Text");
-            ViewData["CardStatusEnum"] = selectList;
+            TempData["FilterCard"] = filter;
+            TempData["CardStatusEnum"] = GetCardStatusList(filter);
+            TempData["CardStatusSelectedIndex"] = (int)filter;
+            TempData["SortBy"] = sortBy;
+            TempData["isAdmin"] = isAdmin;
 
             var appDbContext = isAdmin
                 ? _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId != null)
@@ -111,6 +105,22 @@ namespace WebUI.Controllers
                     break;
             }
             return View(box);
+        }
+
+        public SelectList GetCardStatusList(CardStatusEnum? selectedValue)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+            var arr = Enum.GetValues(typeof(CardStatusEnum));
+            for (int i = 0; i < arr.Length; i++)
+            {
+                list.Add(new SelectListItem()
+                {
+                    Text = arr.GetValue(i).ToString(),
+                    Value = i.ToString(),
+                    Selected = arr.GetValue(i).ToString().Equals(selectedValue.ToString())
+                });
+            }
+            return new SelectList(list, "Value", "Text");
         }
 
         public List<DiagnosticCard> SortList(List<DiagnosticCard> list, SortParamEnum sortBy)

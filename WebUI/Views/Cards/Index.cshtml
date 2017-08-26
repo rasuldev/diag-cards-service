@@ -1,7 +1,7 @@
 ﻿@model WebUI.Models.UserCardsBox
 @{
     ViewData["Title"] = "Список карт";
-    bool isAdmin = ViewData["isAdmin"] == null ? false : (bool)ViewData["isAdmin"];
+    bool isAdmin = TempData["isAdmin"] == null ? false : (bool)TempData["isAdmin"];
 }
 <meta charset="utf-8">
 <h2>@ViewData["Title"]</h2>
@@ -22,11 +22,18 @@
 
         @Html.TextBox("EndDate", null, new { type = "date", placeholder = "Дата создания: до", @class = "form-control" })
 
-        @Html.DropDownList("filter", (SelectList)ViewData["CardStatusEnum"], new { @class = "form-control" })
+        @Html.DropDownList("filter", (SelectList)TempData["CardStatusEnum"], new { @class = "form-control" })
 
         <button type="submit" class="btn btn-warning">Поиск</button>
     </div>
 }
+@{
+            var selectedFilter = (int)TempData["CardStatusSelectedIndex"];
+}
+<script type="text/javascript">
+            var selectedFilter = '@selectedFilter';
+            document.getElementById("filter").selectedIndex = selectedFilter;
+</script>
 
 @* For not registered cards*@
 @if (Model.NotRegisteredCards != null && Model.NotRegisteredCards.Count > 0)
@@ -253,11 +260,11 @@
                     </th>
                     <th>
                         @{
-                            SortParamEnum SortCurrentParam = (SortParamEnum)ViewData["SortParamTable2"];
+                            SortParamEnum SortCurrentParam = (SortParamEnum)TempData["SortBy"];
                             @Html.ActionLink(Html.DisplayNameFor(model => regModel.RegisteredDate), "Index", "Cards", new
                        {
                            sortBy = SortCurrentParam == SortParamEnum.RegistrationDate_ASC ? SortParamEnum.RegistrationDate_DESC : SortParamEnum.RegistrationDate_ASC,
-                           filter = ViewData["Filter"]
+                           filter = TempData["Filter"]
                        });
                         }
                     </th>
@@ -348,7 +355,7 @@
                                 @Html.ActionLink(Html.DisplayNameFor(model => regModel.User.Email), "Index", "Cards", new
                            {
                                sortBy = SortCurrentParam == SortParamEnum.User_ASC ? SortParamEnum.User_DESC : SortParamEnum.User_ASC,
-                               filter = ViewData["Filter"]
+                               filter = TempData["Filter"]
                            })
                             </th>
 
