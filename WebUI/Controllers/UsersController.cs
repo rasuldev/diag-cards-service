@@ -30,8 +30,17 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Index(UserStatusEnum? filter)
         {
             var page = _pager.CurrentPage;
-            if (filter == null) filter = UserStatusEnum.All;
-            ViewData["UserStatusEnum"] = new SelectList(Enum.GetValues(typeof(UserStatusEnum)).Cast<UserStatusEnum>().ToList(), filter);
+            if (filter == null)
+            {
+                if (TempData["filter"] == null)
+                    filter = UserStatusEnum.All;
+                else
+                    filter = (UserStatusEnum)TempData["filter"];
+            }
+
+            TempData["filter"] = filter;
+
+            TempData["UserStatusEnum"] = GetUserStatusList(filter);
             var resultList = new List<User>();
             switch (filter)
             {
@@ -63,6 +72,21 @@ namespace WebUI.Controllers
             return View(resultList.Skip(10 * (page - 1)).Take(10));
         }
 
+        public SelectList GetUserStatusList(UserStatusEnum? selectedValue)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+            var arr = Enum.GetValues(typeof(UserStatusEnum));
+            for (int i = 0; i < arr.Length; i++)
+            {
+                list.Add(new SelectListItem()
+                {
+                    Text = arr.GetValue(i).ToString(),
+                    Value = i.ToString(),
+                    Selected = arr.GetValue(i).ToString().Equals(selectedValue.ToString())
+                });
+            }
+            return new SelectList(list, "Value", "Text");
+        }
         // GET: Users/Details/5
         public async Task<IActionResult> Details(string id)
         {
