@@ -54,7 +54,13 @@ namespace WebUI.Controllers
             isAdmin = User.IsInRole(UserRoles.Admin);
             ViewData["SortParamTable2"] = sortBy;
             ViewData["isAdmin"] = isAdmin;
-            ViewData["CardStatusEnum"] = new SelectList(Enum.GetValues(typeof(CardStatusEnum)).Cast<CardStatusEnum>().ToList(), filter);
+            SelectList selectList = new SelectList(
+                new List<SelectListItem>
+                {
+                    new SelectListItem {Text = "Registered", Value = "0", Selected = filter.Equals(CardStatusEnum.Registered)},
+                    new SelectListItem {Text = "Unregistered", Value = "1", Selected = filter.Equals(CardStatusEnum.Unregistered)},
+                }, "Value", "Text");
+            ViewData["CardStatusEnum"] = selectList;
 
             var appDbContext = isAdmin
                 ? _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId != null)
@@ -120,11 +126,11 @@ namespace WebUI.Controllers
                     break;
                 case SortParamEnum.User_ASC:
                     if (isAdmin)
-                        resultList = list.OrderBy(s => s.User).ToList();
+                        resultList = list.OrderBy(s => s.User.Email).ToList();
                     break;
                 case SortParamEnum.User_DESC:
                     if (isAdmin)
-                        resultList = list.OrderByDescending(s => s.User).ToList();
+                        resultList = list.OrderByDescending(s => s.User.Email).ToList();
                     break;
                 case SortParamEnum.CreationDate_ASC:
                     resultList = list.OrderBy(s => s.CreatedDate).ToList();

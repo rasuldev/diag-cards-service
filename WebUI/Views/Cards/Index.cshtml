@@ -22,7 +22,7 @@
 
         @Html.TextBox("EndDate", null, new { type = "date", placeholder = "Дата создания: до", @class = "form-control" })
 
-        <select asp-items="ViewBag.CardStatusEnum" class="form-control" name="filter"></select>
+        @Html.DropDownList("filter", (SelectList)ViewData["CardStatusEnum"], new { @class = "form-control" })
 
         <button type="submit" class="btn btn-warning">Поиск</button>
     </div>
@@ -118,9 +118,9 @@
                 </th>
                 @if (isAdmin)
                 {
-                <th>
-                    @Html.DisplayNameFor(model => notRegModel.UserId)
-                </th>
+                    <th>
+                        @Html.DisplayNameFor(model => notRegModel.UserId)
+                    </th>
                 }
 
                 <th></th>
@@ -130,109 +130,109 @@
 
             @foreach (var item in Model.NotRegisteredCards)
             {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Lastname)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Firstname)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Patronymic)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.VIN)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IssueYear)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Manufacturer)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Model)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BodyNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FrameNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Running)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RegNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Weight)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Category)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CategoryCommon)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TyreManufacturer)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AllowedMaxWeight)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FuelType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BrakeType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DocumentType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IsForeigner)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DocumentSeries)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DocumentNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DocumentIssueDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DocumentIssuer)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Note)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ExpirationDate)
-                </td>
-                <td>
-                    @if (isAdmin)
-                        {
-                    <th>
-                        @Html.DisplayFor(modelItem => item.UserId)
-                    </th>
-                        }
-
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedDate)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn btn-primary">Изменить</a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Детали</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Удалить</a>
-                        <style>
-                            .action-btn {
-                                width: 100%;
-                                margin-bottom: 5px;
-                            }
-                        </style>
+                        @Html.DisplayFor(modelItem => item.Lastname)
                     </td>
-                </tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Firstname)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Patronymic)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.VIN)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IssueYear)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Manufacturer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Model)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BodyNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FrameNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Running)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RegNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Weight)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CategoryCommon)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TyreManufacturer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AllowedMaxWeight)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FuelType)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BrakeType)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DocumentType)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsForeigner)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DocumentSeries)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DocumentNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DocumentIssueDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DocumentIssuer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Note)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ExpirationDate)
+                    </td>
+                    <td>
+                        @if (isAdmin)
+                        {
+                        <th>
+                            @Html.DisplayFor(modelItem => item.UserId)
+                        </th>
+                        }
+
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn btn-primary">Изменить</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Детали</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Удалить</a>
+                            <style>
+                                .action-btn {
+                                    width: 100%;
+                                    margin-bottom: 5px;
+                                }
+                            </style>
+                        </td>
+                    </tr>
             }
         </tbody>
 
@@ -253,10 +253,10 @@
                     </th>
                     <th>
                         @{
-                            SortParamEnum SortParamCurrentDate = (SortParamEnum)ViewData["SortParamTable2"];
+                            SortParamEnum SortCurrentParam = (SortParamEnum)ViewData["SortParamTable2"];
                             @Html.ActionLink(Html.DisplayNameFor(model => regModel.RegisteredDate), "Index", "Cards", new
                        {
-                           sortBy = SortParamCurrentDate == SortParamEnum.RegistrationDate_ASC ? SortParamEnum.RegistrationDate_DESC : SortParamEnum.RegistrationDate_ASC,
+                           sortBy = SortCurrentParam == SortParamEnum.RegistrationDate_ASC ? SortParamEnum.RegistrationDate_DESC : SortParamEnum.RegistrationDate_ASC,
                            filter = ViewData["Filter"]
                        });
                         }
@@ -344,22 +344,12 @@
 
                         if (isAdmin)
                         {
-                            SortParamEnum SortParamCurrentUser = (SortParamEnum)ViewData["SortParamTable2"];
-                            SortParamEnum SortByUser = SortParamCurrentUser;
-                            switch (SortParamCurrentUser)
-                            {
-                                case SortParamEnum.User_ASC:
-                                    SortByUser = SortParamEnum.User_DESC;
-                                    break;
-                                case SortParamEnum.User_DESC:
-                                    SortByUser = SortParamEnum.User_ASC;
-                                    break;
-                                default:
-                                    SortByUser = SortParamEnum.User_ASC;
-                                    break;
-                            };
                             <th>
-                                @Html.ActionLink(Html.DisplayNameFor(model => regModel.UserId), "Index", "Cards", new { sortParamTable2 = SortByUser })
+                                @Html.ActionLink(Html.DisplayNameFor(model => regModel.User.Email), "Index", "Cards", new
+                           {
+                               sortBy = SortCurrentParam == SortParamEnum.User_ASC ? SortParamEnum.User_DESC : SortParamEnum.User_ASC,
+                               filter = ViewData["Filter"]
+                           })
                             </th>
 
                         }
@@ -458,7 +448,7 @@
                         @if (isAdmin)
                     {
                             <td>
-                                @Html.DisplayFor(modelItem => item.UserId)
+                                @Html.DisplayFor(modelItem => item.User.Email)
                             </td>
                         }
                         <td>
