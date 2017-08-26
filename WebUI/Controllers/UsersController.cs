@@ -38,9 +38,10 @@ namespace WebUI.Controllers
                     filter = (UserStatusEnum)TempData["filter"];
             }
 
+            var statusList = GetUserStatusList(filter);
             TempData["filter"] = filter;
-
-            TempData["UserStatusEnum"] = GetUserStatusList(filter);
+            TempData["UserStatusEnum"] = statusList;
+            TempData["UserStatusSelectedIndex"] = (int)filter;
             var resultList = new List<User>();
             switch (filter)
             {

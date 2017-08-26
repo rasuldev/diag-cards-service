@@ -7,10 +7,10 @@ namespace WebUI.Models
 {
     public enum UserStatusEnum
     {
-        All,
-        Waiting,
-        Accepted,
-        Rejected,
-        Deleted
+        All = 0,
+        Waiting = 1,
+        Accepted = 2,
+        Rejected = 3,
+        Deleted = 4
     }
 }
