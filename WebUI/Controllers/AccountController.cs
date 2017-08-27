@@ -14,6 +14,9 @@ using WebUI.Models.AccountViewModels;
 using WebUI.Services;
 using Microsoft.Extensions.Configuration;
 using WebUI.Models;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using EaisApi.Exceptions;
 
 namespace WebUI.Controllers
 {
@@ -26,6 +29,10 @@ namespace WebUI.Controllers
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly string _externalCookieScheme;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IConfiguration _configuration;
+        private readonly EaisApi.EaistoApi _api;
+
 
         public AccountController(
             UserManager<User> userManager,
@@ -33,7 +40,10 @@ namespace WebUI.Controllers
             IOptions<IdentityCookieOptions> identityCookieOptions,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IHostingEnvironment hostingEnvironment,
+            IConfiguration configuration,
+            EaisApi.EaistoApi api)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -41,6 +51,9 @@ namespace WebUI.Controllers
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
+            _hostingEnvironment = hostingEnvironment;
+            _configuration = configuration;
+            _api = api;
         }
 
         //
@@ -53,9 +66,11 @@ namespace WebUI.Controllers
             await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
 
             ViewData["ReturnUrl"] = returnUrl;
+            redirectUrl = returnUrl;
             return View();
         }
-
+        string redirectUrl;
+        LoginViewModel LoginModel;
         //
         // POST: /Account/Login
         [HttpPost]
@@ -64,20 +79,30 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            redirectUrl = returnUrl;
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var user = await _userManager.FindByNameAsync(model.Email);
-                if (user.IsRemoved)
-                    return View("Banned");
-                if (user.IsApproved != true)
-                    return View("NotApproval");
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                bool isExist = false;
+                if (user != null)
+                {
+                    isExist = true;
+                    if (user.IsRemoved)
+                        return View("Banned");
+                    if (user.IsApproved != true)
+                        return View("NotApproval");
+                }
+                var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
+
+                //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
-                    return RedirectToLocal(returnUrl);
+                    LoginModel = model;
+                    return RedirectToAction("LoginMainSite", "Account");
+                    //return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
                 {
@@ -93,11 +118,56 @@ namespace WebUI.Controllers
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
                 }
+
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginMainSite()
+        {
+            var captcha = await _api.InitRemoteSession();
+
+            CaptchaModel model = new CaptchaModel();
+            model.Filename = Path.GetRandomFileName() + ".jpg";
+            model.ServerPath = _hostingEnvironment.WebRootPath + "/CaptchaTempImages/" + model.Filename;
+
+            //model.FullPath = Path.Combine(model.ServerPath, model.Filename);
+            using (var file = new FileStream(model.ServerPath, FileMode.Create))
+            {
+                captcha.CopyTo(file);
+                captcha.Dispose();
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginMainSite(string captchaText, [FromServices] EaisApi.EaistoApi _api)
+        {
+            string login = _configuration["login"];
+            string pass = _configuration["password"];
+            try
+            {
+                await _api.SignIn(login, pass, captchaText);
+                var result = await _signInManager.PasswordSignInAsync(LoginModel.Email, LoginModel.Password, LoginModel.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
+                    return RedirectToLocal(redirectUrl);
+            }
+            catch (WrongCaptchaException e)
+            {
+                TempData["LoginError"] = "Вы ввели неверную каптчу";
+            }
+            catch (Exception ex)
+            {
+                TempData["LoginError"] = ex.Message;
+            }
+            return RedirectToAction("Login", "Account", new { returnUrl = redirectUrl });
+        }
+
 
         //
         // GET: /Account/Register

@@ -1,0 +1,20 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@using WebUI.Data.Entities
+@model CaptchaModel
+
+<h2>TITLE.</h2>
+@{
+    var path = ViewData["captcha_path"];
+}
+
+<form action="LoginMainSite" method="post">
+    <img src="/CaptchaTempImages/@Model.Filename" alt="Captcha"/>
+    <input asp-for="CaptchaText" type="text" title="Enter the captcha" id="captchaText" />
+    <input type="submit" value="Ок" />
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

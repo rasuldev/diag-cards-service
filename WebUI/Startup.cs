@@ -68,6 +68,8 @@ namespace WebUI
 
             services.AddMvc();
 
+            services.AddSingleton<IConfiguration>(Configuration);
+
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
