@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="wwwroot\images\0.jpg" />
+    <Content Remove="wwwroot/CaptchaTempImages\0.jpg" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
@@ -52,6 +52,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="wwwroot\CaptchaTempImages\" />
+    <Folder Include="wwwroot\CaptchaTempImages\" />
     <Folder Include="wwwroot\CaptchaTempImages\" />
   </ItemGroup>
 

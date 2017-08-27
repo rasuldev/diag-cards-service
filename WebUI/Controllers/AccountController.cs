@@ -17,6 +17,7 @@ using WebUI.Models;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using EaisApi.Exceptions;
+using EaisApi;
 
 namespace WebUI.Controllers
 {
@@ -31,7 +32,6 @@ namespace WebUI.Controllers
         private readonly string _externalCookieScheme;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
-        private readonly EaisApi.EaistoApi _api;
 
 
         public AccountController(
@@ -42,8 +42,7 @@ namespace WebUI.Controllers
             ISmsSender smsSender,
             ILoggerFactory loggerFactory,
             IHostingEnvironment hostingEnvironment,
-            IConfiguration configuration,
-            EaisApi.EaistoApi api)
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -53,30 +52,40 @@ namespace WebUI.Controllers
             _logger = loggerFactory.CreateLogger<AccountController>();
             _hostingEnvironment = hostingEnvironment;
             _configuration = configuration;
-            _api = api;
         }
-
         //
         // GET: /Account/Login
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
+        public async Task<IActionResult> Login([FromServices]EaistoApi _api, string returnUrl = null)
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
 
             ViewData["ReturnUrl"] = returnUrl;
-            redirectUrl = returnUrl;
+            var captcha = await _api.InitRemoteSession();
+
+            CaptchaModel model = new CaptchaModel();
+            model.Filename = Path.GetRandomFileName() + ".jpg";
+            model.ServerPath = _hostingEnvironment.WebRootPath + "/CaptchaTempImages/" + model.Filename;
+            ViewData["CaptchaModel"] = model;
+
+            //model.FullPath = Path.Combine(model.ServerPath, model.Filename);
+            using (var file = new FileStream(model.ServerPath, FileMode.Create))
+            {
+                captcha.CopyTo(file);
+                captcha.Dispose();
+            }
+
             return View();
         }
         string redirectUrl;
-        LoginViewModel LoginModel;
         //
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model, string captchaText, [FromServices]EaistoApi _api, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             redirectUrl = returnUrl;
@@ -94,21 +103,38 @@ namespace WebUI.Controllers
                     if (user.IsApproved != true)
                         return View("NotApproval");
                 }
-                var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
+                var checkResult = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
 
                 //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
+                if (checkResult.Succeeded)
                 {
-                    _logger.LogInformation(1, "User logged in.");
-                    LoginModel = model;
-                    return RedirectToAction("LoginMainSite", "Account");
-                    //return RedirectToLocal(returnUrl);
+                    string login = _configuration["login"];
+                    string pass = _configuration["password"];
+                    try
+                    {
+                        await _api.SignIn(login, pass, captchaText);
+                        var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                        if (signInResult.Succeeded)
+                        {
+                            _logger.LogInformation(1, "User logged in.");
+                            return RedirectToLocal(redirectUrl);
+                        }
+                    }
+                    catch (WrongCaptchaException e)
+                    {
+                        ModelState.AddModelError(string.Empty, "Вы ввели неверную каптчу.");
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                    return View(model);
                 }
-                if (result.RequiresTwoFactor)
+                if (checkResult.RequiresTwoFactor)
                 {
                     return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                 }
-                if (result.IsLockedOut)
+                if (checkResult.IsLockedOut)
                 {
                     _logger.LogWarning(2, "User account locked out.");
                     return View("Lockout");
@@ -124,50 +150,6 @@ namespace WebUI.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginMainSite()
-        {
-            var captcha = await _api.InitRemoteSession();
-
-            CaptchaModel model = new CaptchaModel();
-            model.Filename = Path.GetRandomFileName() + ".jpg";
-            model.ServerPath = _hostingEnvironment.WebRootPath + "/CaptchaTempImages/" + model.Filename;
-
-            //model.FullPath = Path.Combine(model.ServerPath, model.Filename);
-            using (var file = new FileStream(model.ServerPath, FileMode.Create))
-            {
-                captcha.CopyTo(file);
-                captcha.Dispose();
-            }
-            return View(model);
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginMainSite(string captchaText, [FromServices] EaisApi.EaistoApi _api)
-        {
-            string login = _configuration["login"];
-            string pass = _configuration["password"];
-            try
-            {
-                await _api.SignIn(login, pass, captchaText);
-                var result = await _signInManager.PasswordSignInAsync(LoginModel.Email, LoginModel.Password, LoginModel.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                    return RedirectToLocal(redirectUrl);
-            }
-            catch (WrongCaptchaException e)
-            {
-                TempData["LoginError"] = "Вы ввели неверную каптчу";
-            }
-            catch (Exception ex)
-            {
-                TempData["LoginError"] = ex.Message;
-            }
-            return RedirectToAction("Login", "Account", new { returnUrl = redirectUrl });
-        }
-
 
         //
         // GET: /Account/Register
