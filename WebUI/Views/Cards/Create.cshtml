@@ -6,7 +6,7 @@
 }
 
 <h2>Create</h2>
-
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 <form asp-action="Create">
     <div class="form-horizontal">
         <h4>DiagnosticCard</h4>
@@ -50,7 +50,10 @@
         <div class="form-group">
             <label asp-for="Manufacturer" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="Manufacturer" class="form-control" />
+                <input asp-for="Manufacturer" class="form-control" list="manufactureNames"/>
+                <datalist id="manufactureNames">
+                    @Html.Raw(ViewData["ManufacturesOptions"])
+                </datalist>
                 <span asp-validation-for="Manufacturer" class="text-danger"></span>
             </div>
         </div>
@@ -210,10 +213,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-
-<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-<input type="text" id="example_input" name="carManufacture" list="manufactureNames">
-<datalist id="manufactureNames">
-    @Html.Raw(ViewData["ManufacturesOptions"])
-</datalist>
-
