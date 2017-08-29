@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Routing;
 using WebUI.Infrastructure.Pagination;
 using EaisApi;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace WebUI.Controllers
 {
@@ -28,14 +29,16 @@ namespace WebUI.Controllers
         bool isAdmin;
         private readonly Pager _pager;
         EaistoApi _api;
+        IConfiguration _conf;
 
 
-        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api)
+        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf)
         {
             _context = context;
             _userManager = userManager;
             _pager = pager;
             _api = api;
+            _conf = conf;
         }
 
         // GET: Cards
@@ -45,6 +48,7 @@ namespace WebUI.Controllers
             var page = _pager.CurrentPage;
             var UserId = _userManager.GetUserId(User);
             isAdmin = User.IsInRole(UserRoles.Admin);
+            TempData["isDayLimitExhausted"] = isDayLimitExhausted() ? true : false;
 
             if (filter == null)
             {
@@ -309,6 +313,44 @@ namespace WebUI.Controllers
             _context.DiagnosticCards.Remove(diagnosticCard);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
+        }
+
+        // GET: Cards/Delete/5
+        public async Task<IActionResult> Register(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            if (isDayLimitExhausted())
+            {
+                TempData["ErrorText"] = "Лимит исчерпан.";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                // TODO: Save Card
+                var diagnosticCard = _context.DiagnosticCards.SingleOrDefault(m => m.Id == id);
+                diagnosticCard.RegisteredDate = DateTime.Now;
+                diagnosticCard.CardId = "esmil7ewthiejGADFihwmjyrx8";
+                _context.Update(diagnosticCard);
+                _context.SaveChanges();
+                ViewData["ResultText"] = "Карта с номером " + id.ToString() + " отправлена на регистрацию.";
+            }
+            return View();
+        }
+
+
+        private bool isDayLimitExhausted()
+        {
+            int limit = _conf.GetValue<int>("DayLimit");
+            DateTime DateTimeNow = DateTime.Now;
+            DateTime curDate = new DateTime(DateTimeNow.Year, DateTimeNow.Month, DateTimeNow.Day);
+
+            var registeredCardsList = _context.DiagnosticCards.Where(s => s.RegisteredDate != null)
+                .Where(item => item.RegisteredDate.Value.DayOfYear.Equals(curDate.DayOfYear)).ToList();
+            return registeredCardsList.Count >= limit;
         }
 
         private bool DiagnosticCardExists(int id)
