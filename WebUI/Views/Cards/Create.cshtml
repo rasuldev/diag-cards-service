@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Create</h2>
@@ -209,3 +210,10 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<input type="text" id="example_input" name="carManufacture" list="manufactureNames">
+<datalist id="manufactureNames">
+    @Html.Raw(ViewData["ManufacturesOptions"])
+</datalist>
+

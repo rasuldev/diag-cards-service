@@ -15,6 +15,8 @@ using WebUI.Data.Entities;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Routing;
 using WebUI.Infrastructure.Pagination;
+using EaisApi;
+using Newtonsoft.Json;
 
 namespace WebUI.Controllers
 {
@@ -25,13 +27,15 @@ namespace WebUI.Controllers
         UserManager<User> _userManager;
         bool isAdmin;
         private readonly Pager _pager;
+        EaistoApi _api;
 
 
-        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager)
+        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api)
         {
             _context = context;
             _userManager = userManager;
             _pager = pager;
+            _api = api;
         }
 
         // GET: Cards
@@ -173,7 +177,7 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards/Create
-        public IActionResult Create(int? Id)
+        public async Task<IActionResult> Create(int? Id)
         {
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             CreateOrEditInit();
@@ -312,13 +316,14 @@ namespace WebUI.Controllers
             return _context.DiagnosticCards.Any(e => e.Id == id);
         }
 
-        private void CreateOrEditInit()
+        private async void CreateOrEditInit()
         {
             ViewData["CategoriesList"] = new SelectList(InitVehicleCategoryList(), "code", "value");
             ViewData["CategoryCommonList"] = new SelectList(InitVehicleCategoryCommonList(), "code", "value");
             ViewData["FuelTypesList"] = new SelectList(InitFuelTypesList(), "code", "value");
             ViewData["BrakeTypesList"] = new SelectList(InitBrakeTypesList(), "code", "value");
             ViewData["DocumentTypesList"] = new SelectList(InitDocumentTypesList(), "code", "value");
+            ViewData["ManufacturesOptions"] = await InitManufacturesListForHTML();
         }
 
         private List<object> InitVehicleCategoryList()
@@ -360,6 +365,17 @@ namespace WebUI.Controllers
                 Enum.GetValues(typeof(DocumentTypes)).Cast<DocumentTypes>()
                     .Select(x => new { code = x, value = x.ToString() }));
             return categories;
+        }
+        public async Task<String> InitManufacturesListForHTML()
+        {
+            var result = await _api.GetAllManufacturers();
+            ManufacturerSuggestions sug = JsonConvert.DeserializeObject<ManufacturerSuggestions>(result);
+            string options = "";
+            foreach (var item in sug.Suggestions)
+            {
+                options += "<option>" + item + "</option>\r\n";
+            }
+            return options;
         }
     }
 }
