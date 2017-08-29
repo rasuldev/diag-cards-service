@@ -7,8 +7,8 @@ namespace WebUI.Models
 {
     public enum SortParamEnum
     {
-        CreationDate_ASC,
-        //CreationDate_DESC,
+        //CreationDate_ASC,
+        CreationDate_DESC,
         RegistrationDate_ASC,
         RegistrationDate_DESC,
         User_ASC,

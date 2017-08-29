@@ -105,7 +105,7 @@ namespace WebUI.Controllers
                     box.RegisteredCards = SortList(registeredCardsList, sortBy).Skip(10 * (page - 1)).Take(10).ToList();
                     break;
                 case CardStatusEnum.Unregistered:
-                    box.NotRegisteredCards = SortList(notRegisteredCardsList, sortBy).Skip(10 * (page - 1)).Take(10).ToList();
+                    box.NotRegisteredCards = SortList(notRegisteredCardsList, SortParamEnum.CreationDate_DESC).Skip(10 * (page - 1)).Take(10).ToList();
                     break;
             }
             return View(box);
@@ -146,8 +146,8 @@ namespace WebUI.Controllers
                     if (isAdmin)
                         resultList = list.OrderByDescending(s => s.User.Email).ToList();
                     break;
-                case SortParamEnum.CreationDate_ASC:
-                    resultList = list.OrderBy(s => s.CreatedDate).ToList();
+                case SortParamEnum.CreationDate_DESC:
+                    resultList = list.OrderByDescending(s => s.CreatedDate).ToList();
                     break;
                 default:
                     resultList = list.OrderBy(s => s.CardId).ToList();
