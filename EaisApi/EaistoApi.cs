@@ -220,6 +220,21 @@ namespace EaisApi
             return json;
         }
 
+        public async Task<string> GetAllManufacturers()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, SearchManufacturersUrl);
+            SetSessionCookie(request);
+            var response = await Client.SendAsync(request);
+            if (sessionIsExpired(response))
+            {
+                throw new NotAuthorizedException();
+            }
+            //var bytes = await response.Content.ReadAsByteArrayAsync();
+            var json = await response.Content.ReadAsStringAsync();
+            json = System.Text.RegularExpressions.Regex.Unescape(json);
+            return json;
+        }
+
         public async Task<string> GetModels(string manufacturer, string query)
         {
             var request = new HttpRequestMessage(HttpMethod.Get,
@@ -323,7 +338,7 @@ namespace EaisApi
             }
 
             var json = await response.Content.ReadAsStringAsync();
-            var responseContainer = new {result = -1};
+            var responseContainer = new { result = -1 };
             return (CheckResults)JsonConvert.DeserializeAnonymousType(json, responseContainer).result;
         }
 
@@ -354,7 +369,7 @@ namespace EaisApi
             Add("TIP_TOPLIVA", info.FuelType.GetValueAsString());
             Add("TIP_TORMOZ_SISTEMY", info.BrakeType.GetValueAsString());
 
-            
+
             Add("SVID_O_REG", info.DocumentType == DocumentTypes.RegistrationCertificate ? "0" : "1");
             Add("SVID_O_REG_SERIA", info.DocumentSeries);
             Add("SVID_O_REG_NOMER", info.DocumentNumber);
@@ -362,7 +377,7 @@ namespace EaisApi
             Add("SVID_O_REG_KEM", info.DocumentIssuer);
             if (info.IsForeigner)
                 Add("SVID_FOREIGN", "1");
-            
+
 
             // Expertise result (it is not change)
             Add("table_version", "list");
