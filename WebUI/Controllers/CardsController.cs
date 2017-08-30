@@ -316,6 +316,33 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards/Delete/5
+        public IActionResult Search()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Search(string vin, string regNumber, string ticketSeries, string ticketNumber, string bodyNumber, string frameNumber)
+        {
+            vin = prepareParameter(vin);
+            regNumber = prepareParameter(regNumber);
+            ticketSeries = prepareParameter(ticketSeries);
+            ticketNumber = prepareParameter(ticketNumber);
+            bodyNumber = prepareParameter(bodyNumber);
+            frameNumber = prepareParameter(frameNumber);
+
+            // Method is not working
+            string result = await _api.Search(vin, regNumber, ticketSeries, ticketNumber, bodyNumber, frameNumber);
+            ViewData["Result"] = result;
+            return View();
+        }
+
+        public string prepareParameter(string par)
+        {
+            return par.Replace(" ", "").Length > 1 ? par : null;
+        }
+
+        // GET: Cards/Delete/5
         public async Task<IActionResult> Register(int? id)
         {
             if (id == null)

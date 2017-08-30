@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Search";
+}
+
+<h2>Search</h2>
+
+@ViewData["Result"]
+
+@using (Html.BeginForm())
+{
+    <input name="vin" type="text" />
+    <input name="regNumber" type="text" />
+    <input name="ticketSeries" type="text" />
+    <input name="ticketNumber" type="text" />
+    <input name="bodyNumber" type="text" />
+    <input name="frameNumber" type="text" />
+    <input type="submit" value="Search" />
+}
