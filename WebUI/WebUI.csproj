@@ -15,6 +15,24 @@
   <ItemGroup>
     <Content Remove="wwwroot/CaptchaTempImages\0.jpg" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="wwwroot\lib\design\bootstrap-datepicker3.min.css" />
+    <Content Include="wwwroot\lib\design\css" />
+    <Content Include="wwwroot\lib\design\css\bootstrap-datepicker3.min.css" />
+    <Content Include="wwwroot\lib\design\css\css" />
+    <Content Include="wwwroot\lib\design\css\font-awesome.min.css" />
+    <Content Include="wwwroot\lib\design\css\home.min.css" />
+    <Content Include="wwwroot\lib\design\font-awesome.min.css" />
+    <Content Include="wwwroot\lib\design\home.min.css" />
+    <Content Include="wwwroot\lib\design\js\bootstrap-datepicker.min.js" />
+    <Content Include="wwwroot\lib\design\js\bootstrap-datepicker.ru.min.js" />
+    <Content Include="wwwroot\lib\design\js\bootstrap.min.js" />
+    <Content Include="wwwroot\lib\design\js\dk.min.js" />
+    <Content Include="wwwroot\lib\design\js\home.min.js" />
+    <Content Include="wwwroot\lib\design\js\jquery.autocomplete.min.js" />
+    <Content Include="wwwroot\lib\design\js\jquery.maskedinput.min.js" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
