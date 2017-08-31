@@ -16,7 +16,8 @@ namespace WebUI.Services
 
         public ApiUserData LoadData()
         {
-            return JsonConvert.DeserializeObject<ApiUserData>(_session.GetString(UserDataKey));
+            var data = _session.GetString(UserDataKey);
+            return data == null ? null : JsonConvert.DeserializeObject<ApiUserData>(data);
         }
 
         public void SaveData(ApiUserData data)
