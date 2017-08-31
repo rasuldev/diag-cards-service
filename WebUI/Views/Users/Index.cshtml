@@ -9,17 +9,10 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-@using (Html.BeginForm())
+@using (Html.BeginForm(FormMethod.Get))
 {
     <div class="form-inline">
         @Html.DropDownList("filter", (SelectList)TempData["UserStatusEnum"], new { @class = "form-control" })
-        @{
-            var selectedFilter = (int)TempData["UserStatusSelectedIndex"];
-        }
-        <script type="text/javascript">
-            var selectedFilter = '@selectedFilter';
-            document.getElementById("filter").selectedIndex = selectedFilter;
-        </script>
         <input type="submit" value="Filter" class="btn btn-default" />
     </div>
             }

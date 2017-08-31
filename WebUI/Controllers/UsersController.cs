@@ -31,12 +31,7 @@ namespace WebUI.Controllers
         {
             var page = _pager.CurrentPage;
             if (filter == null)
-            {
-                if (TempData["filter"] == null)
-                    filter = UserStatusEnum.All;
-                else
-                    filter = (UserStatusEnum)TempData["filter"];
-            }
+                filter = UserStatusEnum.All;
 
             var statusList = GetUserStatusList(filter);
             TempData["filter"] = filter;
