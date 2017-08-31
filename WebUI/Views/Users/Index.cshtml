@@ -1,13 +1,13 @@
 @model IEnumerable<WebUI.Data.Entities.User>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Главная";
 }
 
-<h2>Index</h2>
+<h2>Список пользователей</h2>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Добавить нового пользователя</a>
 </p>
 @using (Html.BeginForm(FormMethod.Get))
 {
@@ -28,9 +28,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Email)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmailConfirmed)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -42,26 +39,26 @@
             if (item.IsRemoved)
             {
                 trStatus = "danger";
-                textStatus = "Deleted";
+                textStatus = "Удален";
             }
             else
             {
                 if (item.IsApproved == null)
                 {
                     trStatus = "info";
-                    textStatus = "Waiting for activation";
+                    textStatus = "Ожидает подтверждения";
                 }
                 else
                 {
                     if (item.IsApproved == true)
                     {
                         trStatus = "success";
-                        textStatus = "Accepted";
+                        textStatus = "Принят";
                     }
                     else
                     {
                         trStatus = "warning";
-                        textStatus = "Rejected";
+                        textStatus = "Отклонен";
                     }
                 }
             }
@@ -75,43 +72,28 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
-                <td style="text-align:center;">
-                    @if (item.EmailConfirmed)
-                    {
-                        <text>
-                        <button class="btn-strong-small btn btn-success">Verified</button>
-                        </text>
-                    }
-                    else
-                    {
-
-                        <text>
-                        <button class="btn-strong-small btn btn-warning">Unverified</button>
-                        </text>
-                    }
-                </td>
                 <td>
                     <div class="form-inline">
                         @switch (trStatus)
                         {
                             case "danger": // deleted user
-                                <a asp-action="Restore" asp-route-id="@item.Id" class="action-btn btn btn-info">Restore</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
+                                <a asp-action="Restore" asp-route-id="@item.Id" class="action-btn btn btn-info">Восстановить</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Подробно</a>
                                 break;
                             case "success":// accepted user
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn btn-primary">Edit</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Delete</a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn btn-primary">Редактирование</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Подробно</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Удалить</a>
                                 break;
                             case "info":// waiting user
-                                <a asp-action="Accept" asp-route-id="@item.Id" class="action-btn btn btn-success">Accept</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
-                                <a asp-action="Reject" asp-route-id="@item.Id" class="action-btn btn btn-warning">Reject</a>
+                                <a asp-action="Accept" asp-route-id="@item.Id" class="action-btn btn btn-success">Подтвердить</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Подробно</a>
+                                <a asp-action="Reject" asp-route-id="@item.Id" class="action-btn btn btn-warning">Отклонить</a>
                                 break;
                             case "warning":// rejected user
-                                <a asp-action="Accept" asp-route-id="@item.Id" class="action-btn btn btn-success">Accept</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Details</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Delete</a>
+                                <a asp-action="Accept" asp-route-id="@item.Id" class="action-btn btn btn-success">Подтвердить</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn btn-info">Подробно</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Удалить</a>
                                 break;
                         }
                     </div>

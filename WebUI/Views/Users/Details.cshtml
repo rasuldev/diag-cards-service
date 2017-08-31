@@ -1,13 +1,13 @@
 @model WebUI.Data.Entities.User
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Детали";
 }
 
-<h2>Details</h2>
+<h2>Детали</h2>
 
 <div>
-    <h4>User</h4>
+    <h4>Пользователь</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -109,9 +109,9 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Index" class="btn btn-default">Back to list</a>
+    <a asp-action="Index" class="btn btn-default">Назад к списку</a>
     @if (!Model.IsRemoved)
     {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="action-btn btn btn-primary">Edit</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="action-btn btn btn-primary">Редактирование</a>
     }
 </div>
