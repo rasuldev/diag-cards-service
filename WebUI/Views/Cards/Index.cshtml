@@ -21,7 +21,7 @@
     }
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(FormMethod.Get))
 {
     <div class="form-inline">
         @Html.TextBox("Regnumber", null, new { placeholder = "Регистрационный номер", @class = "form-control" })
@@ -36,16 +36,18 @@
 
         @Html.DropDownList("filter", (SelectList)TempData["CardStatusEnum"], new { @class = "form-control" })
 
+        @{
+            if (isAdmin)
+            {
+                <text>
+                @Html.DropDownList("userId", (SelectList)TempData["UsersList"], new { @class = "form-control" })
+                </text>
+            }
+        }
+
         <button type="submit" class="btn btn-warning">Поиск</button>
     </div>
-}
-@{
-            var selectedFilter = (int)TempData["CardStatusSelectedIndex"];
-}
-<script type="text/javascript">
-            var selectedFilter = '@selectedFilter';
-            document.getElementById("filter").selectedIndex = selectedFilter;
-</script>
+            }
 
 @* For not registered cards*@
 @if (Model.NotRegisteredCards != null && Model.NotRegisteredCards.Count > 0)

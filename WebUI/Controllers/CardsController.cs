@@ -43,7 +43,7 @@ namespace WebUI.Controllers
 
         // GET: Cards
         public async Task<IActionResult> Index(SortParamEnum sortBy,
-            string Regnumber, string VIN, string FIO, DateTime? StartDate, DateTime? EndDate, CardStatusEnum? filter)
+            string Regnumber, string VIN, string FIO, DateTime? StartDate, DateTime? EndDate, CardStatusEnum? filter, string userId)
         {
             var page = _pager.CurrentPage;
             var UserId = _userManager.GetUserId(User);
@@ -51,14 +51,8 @@ namespace WebUI.Controllers
             TempData["isDayLimitExhausted"] = isDayLimitExhausted() ? true : false;
 
             if (filter == null)
-            {
-                if (TempData["FilterCard"] == null)
-                    filter = CardStatusEnum.Registered;
-                else
-                    filter = (CardStatusEnum)TempData["FilterCard"];
-            }
+                filter = CardStatusEnum.Unregistered;
 
-            TempData["FilterCard"] = filter;
             TempData["CardStatusEnum"] = GetCardStatusList(filter);
             TempData["CardStatusSelectedIndex"] = (int)filter;
             TempData["SortBy"] = sortBy;
@@ -67,6 +61,19 @@ namespace WebUI.Controllers
             var appDbContext = isAdmin
                 ? _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId != null)
                 : _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId.Equals(UserId));
+
+            if (isAdmin)
+            {
+                string uId = "All";
+                if (!String.IsNullOrEmpty(userId))
+                {
+                    uId = userId;
+                    if (!userId.Equals("All")) // if not All
+                        appDbContext = appDbContext.Where(item => item.User.Id.Equals(uId));
+                }
+                TempData["FilterUser"] = uId;
+                TempData["UsersList"] = GetUsersList(uId);
+            }
 
             // Filter
             if (FIO != null && FIO != "")
@@ -93,6 +100,8 @@ namespace WebUI.Controllers
             if (VIN != null && VIN != "")
                 appDbContext = appDbContext.Where(item => item.VIN.Contains(VIN));
             //--- Filter
+
+
 
             // Split to 2 list registered and not registered items
             var registeredCardsList = appDbContext.Where(s => s.RegisteredDate != null).ToList();
@@ -128,6 +137,27 @@ namespace WebUI.Controllers
                     Selected = arr.GetValue(i).ToString().Equals(selectedValue.ToString())
                 });
             }
+            return new SelectList(list, "Value", "Text");
+        }
+        public SelectList GetUsersList(string selectedUserId)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+            var db = _context.User.ToList();
+            foreach (var user in db)
+            {
+                list.Add(new SelectListItem()
+                {
+                    Text = user.Email,
+                    Value = user.Id,
+                    Selected = selectedUserId.Equals(user.Id)
+                });
+            }
+            list.Add(new SelectListItem()
+            {
+                Text = "All",
+                Value = "All",
+                Selected = selectedUserId.Equals("All")
+            });
             return new SelectList(list, "Value", "Text");
         }
 
