@@ -62,22 +62,28 @@ namespace WebUI.Controllers
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
 
+            LoginViewModel model = new LoginViewModel();
+
             ViewData["ReturnUrl"] = returnUrl;
-            var captcha = await _api.InitRemoteSession();
-
-            CaptchaModel model = new CaptchaModel();
-            model.Filename = Path.GetRandomFileName() + ".jpg";
-            model.ServerPath = _hostingEnvironment.WebRootPath + "/CaptchaTempImages/" + model.Filename;
-            ViewData["CaptchaModel"] = model;
-
-            //model.FullPath = Path.Combine(model.ServerPath, model.Filename);
-            using (var file = new FileStream(model.ServerPath, FileMode.Create))
+            try
             {
-                captcha.CopyTo(file);
-                captcha.Dispose();
+                var captcha = await _api.InitRemoteSession();
+                
+                model.CaptchaFilename = Path.GetRandomFileName() + ".jpg";
+                model.CaptchaServerPath = _hostingEnvironment.WebRootPath + "/CaptchaTempImages/" + model.CaptchaFilename;
+                //model.FullPath = Path.Combine(model.ServerPath, model.Filename);
+                using (var file = new FileStream(model.CaptchaServerPath, FileMode.Create))
+                {
+                    captcha.CopyTo(file);
+                    captcha.Dispose();
+                }
             }
-
-            return View();
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+            }
+                        
+            return View(model);
         }
         string redirectUrl;
         //
@@ -85,7 +91,7 @@ namespace WebUI.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string captchaText, [FromServices]EaistoApi _api, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model, [FromServices]EaistoApi _api, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             redirectUrl = returnUrl;
@@ -112,7 +118,7 @@ namespace WebUI.Controllers
                     string pass = _configuration["password"];
                     try
                     {
-                        await _api.SignIn(login, pass, captchaText);
+                        await _api.SignIn(login, pass, model.CaptchaText);
                         var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                         if (signInResult.Succeeded)
                         {
@@ -122,6 +128,7 @@ namespace WebUI.Controllers
                     }
                     catch (WrongCaptchaException e)
                     {
+                        
                         ModelState.AddModelError(string.Empty, "Вы ввели неверную каптчу.");
                     }
                     catch (Exception ex)

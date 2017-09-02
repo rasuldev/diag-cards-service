@@ -43,11 +43,8 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    @{
-                        CaptchaModel captchaModel = (CaptchaModel)ViewData["CaptchaModel"];
-                    }
-                    <img src="/CaptchaTempImages/@captchaModel.Filename" alt="Captcha" />
-                    <input type="text" id="captchaText" name="captchaText"/>
+                    <img src="/CaptchaTempImages/@Model.CaptchaFilename" alt="Captcha" />
+                    <input asp-for="CaptchaText" type="text"/>
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
