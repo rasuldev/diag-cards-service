@@ -13,6 +13,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\CaptchaTempImages\**" />
+    <Content Remove="wwwroot\CaptchaTempImages\**" />
+    <EmbeddedResource Remove="wwwroot\CaptchaTempImages\**" />
+    <None Remove="wwwroot\CaptchaTempImages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot/CaptchaTempImages\0.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -50,11 +57,6 @@
     <None Update="nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="wwwroot\CaptchaTempImages\" />
-    <Folder Include="wwwroot\CaptchaTempImages\" />
-    <Folder Include="wwwroot\CaptchaTempImages\" />
   </ItemGroup>
 
 </Project>

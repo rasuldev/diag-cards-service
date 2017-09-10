@@ -16,8 +16,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Routing;
 using WebUI.Infrastructure.Pagination;
 using EaisApi;
+using EaisApi.Exceptions;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using WebUI.Models.CardsViewModels;
 
 namespace WebUI.Controllers
@@ -31,15 +33,18 @@ namespace WebUI.Controllers
         private readonly Pager _pager;
         readonly EaistoApi _api;
         readonly IConfiguration _conf;
+        private readonly ILogger<CardsController> _logger;
 
 
-        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf)
+
+        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf, ILogger<CardsController> logger)
         {
             _context = context;
             _userManager = userManager;
             _pager = pager;
             _api = api;
             _conf = conf;
+            _logger = logger;
         }
 
         // GET: Cards
@@ -58,8 +63,12 @@ namespace WebUI.Controllers
             TempData["SortBy"] = model.Filter.SortBy;
             TempData["isAdmin"] = isAdmin;
 
+            //var card = _context.DiagnosticCards.First();
+            //card.UserId = UserId;
+            //_context.SaveChanges();
+
             var cards = isAdmin
-                ? _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId != null)
+                ? _context.DiagnosticCards.Include(d => d.User)
                 : _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId.Equals(UserId));
 
             if (isAdmin)
@@ -153,7 +162,7 @@ namespace WebUI.Controllers
             return new SelectList(list, "Value", "Text");
         }
 
-        public IQueryable<DiagnosticCard> SortList(IQueryable<DiagnosticCard> list, SortParamEnum sortBy)
+        private IQueryable<DiagnosticCard> SortList(IQueryable<DiagnosticCard> list, SortParamEnum sortBy)
         {
             switch (sortBy)
             {
@@ -202,7 +211,7 @@ namespace WebUI.Controllers
                 var diagnosticCard = _context.DiagnosticCards
                 .Include(d => d.User)
                 .SingleOrDefault(m => m.Id == Id);
-                if (diagnosticCard != null && diagnosticCard.RegisteredDate != null)
+                if (diagnosticCard?.RegisteredDate != null)
                 {
                     diagnosticCard.CreatedDate = DateTime.Now;
                     return View(diagnosticCard);
@@ -252,7 +261,7 @@ namespace WebUI.Controllers
             }
             if (diagnosticCard.RegisteredDate != null)
                 return RedirectToAction("Index");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", diagnosticCard.UserId);
+            //ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", diagnosticCard.UserId);
             return View(diagnosticCard);
         }
 
@@ -354,7 +363,7 @@ namespace WebUI.Controllers
             return par.Replace(" ", "").Length > 1 ? par : null;
         }
 
-        // GET: Cards/Delete/5
+        [HttpPost("register")]
         public async Task<IActionResult> Register(int? id)
         {
             if (id == null)
@@ -364,20 +373,44 @@ namespace WebUI.Controllers
 
             if (isDayLimitExhausted())
             {
-                TempData["ErrorText"] = "Лимит исчерпан.";
+                TempData["ErrorText"] = "Лимит регистраций на сегодня исчерпан.";
                 return RedirectToAction("Index");
             }
-            else
+            
+            // TODO: Save Card
+            var diagnosticCard = _context.DiagnosticCards.SingleOrDefault(m => m.Id == id);
+            if (diagnosticCard.UserId != _userManager.GetUserId(User))
             {
-                // TODO: Save Card
-                var diagnosticCard = _context.DiagnosticCards.SingleOrDefault(m => m.Id == id);
+                TempData["ErrorText"] = "Это карта принадлежит другому пользователю";
+                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to register card with id={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                var cardId = await _api.SaveCard(diagnosticCard);
+                diagnosticCard.CardId = cardId;
                 diagnosticCard.RegisteredDate = DateTime.Now;
-                diagnosticCard.CardId = "esmil7ewthiejGADFihwmjyrx8";
                 _context.Update(diagnosticCard);
                 _context.SaveChanges();
-                ViewData["ResultText"] = "Карта с номером " + id + " отправлена на регистрацию.";
+                TempData["ResultText"] = "Карта с номером " + id + " отправлена на регистрацию.";
             }
-            return View();
+            catch (CheckCardException e)
+            {
+                _logger.LogError(e.ToString());
+                switch (e.CheckResult)
+                {
+                    case CheckResults.CouponAlreadyExists:
+                    case CheckResults.DuplicateToday:
+                        TempData["ErrorText"] =
+                            "Сегодня уже были сохранены результаты ТО на ТС с указанным VIN и Государственным регистрационным знаком";
+                        break;
+                    default:
+                        TempData["ErrorText"] = "При регистрации произошла ошибка. Попробуйте еще раз позже.";
+                        break;
+                }
+            }
+            return RedirectToAction("Index");
         }
 
 

@@ -42,6 +42,9 @@
     </div>
             }
 
+<form id="register_form" method="post" asp-action="Register">
+    <input type="hidden" id="reg_form_card_id" name="id" />
+</form>
 
 <table class="table table-striped">
     <thead>
@@ -56,7 +59,7 @@
                 @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().VIN)
             </th>
             <th>
-                Марка (Модель, год)
+                Марка, модель (год)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().Running)
@@ -70,7 +73,7 @@
             @if (User.IsInRole(UserRoles.Admin))
             {
                 <th>
-                    @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().UserId)
+                    Пользователь
                 </th>
             }
             <th></th>
@@ -92,7 +95,7 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Manufacturer)
-                    (@Html.DisplayFor(modelItem => item.Model), @Html.DisplayFor(modelItem => item.IssueYear))
+                    @Html.DisplayFor(modelItem => item.Model) (@Html.DisplayFor(modelItem => item.IssueYear))
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Running)
@@ -106,7 +109,7 @@
                 @if (User.IsInRole(UserRoles.Admin))
                 {
                     <td>
-                        @Html.DisplayFor(modelItem => item.UserId)
+                        @Html.DisplayFor(modelItem => item.User.UserName)
 
                     </td>
                 }
@@ -123,7 +126,7 @@
                     @{
                         bool isDayLimitReached = (bool)TempData["isDayLimitExhausted"];
                         string isDisabled = isDayLimitReached ? "disabled" : "";
-                        <a asp-action="Register" asp-route-id="@item.Id" class="btn btn-success @isDisabled" title="Зарегистировать">
+                        <a href=""  data-id="@item.Id" class="btn btn-success @isDisabled btn-register" title="Зарегистрировать">
                             <i class="fa fa-registered" aria-hidden="true"></i>
                         </a>
                     }
@@ -142,6 +145,13 @@
 </table>
 @Html.PagerLinks(totalCount: Model.TotalCardsCount, pageSize: 10, visiblePagesCount: 10)
 
+<script type="text/javascript">
+    $("a.btn-register").on("click", function (e) {
+        e.preventDefault();
+        $("#reg_form_card_id").val($(this).attr("data-id"));
+        $("#register_form").submit();
+    })
+</script>
 
 
 
