@@ -7,6 +7,7 @@ namespace WebUI.Models
 {
     public enum CardStatusEnum
     {
+        All,
         Registered,
         Unregistered
     }

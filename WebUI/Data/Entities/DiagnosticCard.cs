@@ -17,5 +17,9 @@ namespace WebUI.Data.Entities
         /// </summary>
         [Display(Name = "Дата регистрации")]
         public DateTime? RegisteredDate { get; set; }
+
+        [NotMapped]
+        [Display(Name = "ФИО")]
+        public string Fullname => $"{Lastname} {Firstname} {Patronymic}";
     }
 }

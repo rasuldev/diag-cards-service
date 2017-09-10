@@ -37,9 +37,11 @@ namespace EaisApi.Models
         public string FrameNumber { get; set; }
         [Display(Name = "Пробег ТС (км)"), Range(100, int.MaxValue)]
         public int Running { get; set; }
-        [Display(Name = "Государственный регистрационный знак"), MaxLength(10)]
+        /// <summary>
+        /// Государственный регистрационный знак
+        /// </summary>
+        [Display(Name = "Рег. знак"), MaxLength(10)]
         public string RegNumber { get; set; }
-
         /// <summary>
         /// Масса без нагрузки (кг)
         /// </summary>

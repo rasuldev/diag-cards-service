@@ -44,8 +44,10 @@ namespace EaisApi
             var handler = new HttpClientHandler
             {
                 AllowAutoRedirect = false,
+                UseCookies = false
                 //CookieContainer = cookies
             };
+            
             Client = new HttpClient(handler);
         }
 

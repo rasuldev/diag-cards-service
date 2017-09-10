@@ -48,3 +48,12 @@ textarea {
         display: none;
     }
 }
+
+td.actions {
+    width: 150px;    
+}
+
+td.actions a.btn {
+    width: 30px;
+    padding: 6px;
+}

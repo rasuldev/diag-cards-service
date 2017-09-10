@@ -18,6 +18,7 @@ using WebUI.Infrastructure.Pagination;
 using EaisApi;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
+using WebUI.Models.CardsViewModels;
 
 namespace WebUI.Controllers
 {
@@ -25,11 +26,11 @@ namespace WebUI.Controllers
     public class CardsController : Controller
     {
         private readonly AppDbContext _context;
-        UserManager<User> _userManager;
+        readonly UserManager<User> _userManager;
         bool isAdmin;
         private readonly Pager _pager;
-        EaistoApi _api;
-        IConfiguration _conf;
+        readonly EaistoApi _api;
+        readonly IConfiguration _conf;
 
 
         public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf)
@@ -42,86 +43,77 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards
-        public async Task<IActionResult> Index(SortParamEnum sortBy,
-            string Regnumber, string VIN, string FIO, DateTime? StartDate, DateTime? EndDate, CardStatusEnum? filter, string userId)
+        public async Task<IActionResult> Index(ListCardsViewModel model)
         {
             var page = _pager.CurrentPage;
             var UserId = _userManager.GetUserId(User);
             isAdmin = User.IsInRole(UserRoles.Admin);
-            TempData["isDayLimitExhausted"] = isDayLimitExhausted() ? true : false;
+            TempData["isDayLimitExhausted"] = isDayLimitExhausted();
 
-            if (filter == null)
-                filter = CardStatusEnum.Unregistered;
+            if (model.Filter.Status == null)
+                model.Filter.Status = CardStatusEnum.All;
 
-            TempData["CardStatusEnum"] = GetCardStatusList(filter);
-            TempData["CardStatusSelectedIndex"] = (int)filter;
-            TempData["SortBy"] = sortBy;
+            TempData["CardStatusEnum"] = GetCardStatusList(model.Filter.Status);
+            TempData["CardStatusSelectedIndex"] = (int)model.Filter.Status;
+            TempData["SortBy"] = model.Filter.SortBy;
             TempData["isAdmin"] = isAdmin;
 
-            var appDbContext = isAdmin
+            var cards = isAdmin
                 ? _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId != null)
                 : _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId.Equals(UserId));
 
             if (isAdmin)
             {
                 string uId = "All";
-                if (!String.IsNullOrEmpty(userId))
+                if (!String.IsNullOrEmpty(model.Filter.UserId))
                 {
-                    uId = userId;
-                    if (!userId.Equals("All")) // if not All
-                        appDbContext = appDbContext.Where(item => item.User.Id.Equals(uId));
+                    uId = model.Filter.UserId;
+                    if (!model.Filter.UserId.Equals("All")) // if not All
+                        cards = cards.Where(item => item.User.Id.Equals(uId));
                 }
                 TempData["FilterUser"] = uId;
                 TempData["UsersList"] = GetUsersList(uId);
             }
 
             // Filter
-            if (FIO != null && FIO != "")
+            if (!string.IsNullOrEmpty(model.Filter.Fullname))
             {
                 string name = "", lastname = "", patronymic = "";
-                var arr = FIO.Split(' ');
+                var arr = model.Filter.Fullname.Split(' ');
                 if (arr.Length > 0)
                     lastname = arr[0];
                 if (arr.Length > 1)
                     name = arr[1];
                 if (arr.Length > 2)
                     patronymic = arr[2];
-                appDbContext = appDbContext.Where(item => item.Lastname.StartsWith(lastname))
+                cards = cards.Where(item => item.Lastname.StartsWith(lastname))
                 .Where(item => item.Firstname.StartsWith(name))
                 .Where(item => item.Patronymic.StartsWith(patronymic));
             }
-            if (StartDate != null)
-                appDbContext = appDbContext.Where(item => item.CreatedDate > StartDate);
-            if (EndDate != null)
-                appDbContext = appDbContext.Where(item => item.CreatedDate < EndDate);
+            if (model.Filter.StartDate != null)
+                cards = cards.Where(item => item.CreatedDate > model.Filter.StartDate);
+            if (model.Filter.EndDate != null)
+                cards = cards.Where(item => item.CreatedDate < model.Filter.EndDate);
 
-            if (Regnumber != null && Regnumber != "")
-                appDbContext = appDbContext.Where(item => item.RegNumber.Contains(Regnumber));
-            if (VIN != null && VIN != "")
-                appDbContext = appDbContext.Where(item => item.VIN.Contains(VIN));
+            if (!string.IsNullOrEmpty(model.Filter.Regnumber))
+                cards = cards.Where(item => item.RegNumber.Contains(model.Filter.Regnumber));
+            if (!string.IsNullOrEmpty(model.Filter.Vin))
+                cards = cards.Where(item => item.VIN.Contains(model.Filter.Vin));
             //--- Filter
 
-
-
-            // Split to 2 list registered and not registered items
-            var registeredCardsList = appDbContext.Where(s => s.RegisteredDate != null).ToList();
-            var notRegisteredCardsList = appDbContext.Where(s => s.RegisteredDate == null).ToList();
-            //--- Split to 2 list registered and not registered items
-
-            ViewData["RegCardsCount"] = registeredCardsList.Count;
-            ViewData["NotRegCardsCount"] = notRegisteredCardsList.Count;
-
-            UserCardsBox box = new UserCardsBox();
-            switch (filter)
+            switch (model.Filter.Status)
             {
                 case CardStatusEnum.Registered:
-                    box.RegisteredCards = SortList(registeredCardsList, sortBy).Skip(10 * (page - 1)).Take(10).ToList();
+                    cards = cards.Where(c => c.RegisteredDate != null);
                     break;
                 case CardStatusEnum.Unregistered:
-                    box.NotRegisteredCards = SortList(notRegisteredCardsList, SortParamEnum.CreationDate_DESC).Skip(10 * (page - 1)).Take(10).ToList();
+                    cards = cards.Where(c => c.RegisteredDate == null);
                     break;
             }
-            return View(box);
+
+            model.TotalCardsCount = await cards.CountAsync();
+            model.Cards = SortList(cards, SortParamEnum.CreationDate_DESC).Skip(10 * (page - 1)).Take(10).ToList();
+            return View(model);
         }
 
         public SelectList GetCardStatusList(CardStatusEnum? selectedValue)
@@ -161,33 +153,23 @@ namespace WebUI.Controllers
             return new SelectList(list, "Value", "Text");
         }
 
-        public List<DiagnosticCard> SortList(List<DiagnosticCard> list, SortParamEnum sortBy)
+        public IQueryable<DiagnosticCard> SortList(IQueryable<DiagnosticCard> list, SortParamEnum sortBy)
         {
-            var resultList = new List<DiagnosticCard>();
             switch (sortBy)
             {
                 case SortParamEnum.RegistrationDate_ASC:
-                    resultList = list.OrderBy(s => s.RegisteredDate).ToList();
-                    break;
+                    return list.OrderBy(s => s.RegisteredDate);
                 case SortParamEnum.RegistrationDate_DESC:
-                    resultList = list.OrderByDescending(s => s.RegisteredDate).ToList();
-                    break;
+                    return list.OrderByDescending(s => s.RegisteredDate);
                 case SortParamEnum.User_ASC:
-                    if (isAdmin)
-                        resultList = list.OrderBy(s => s.User.Email).ToList();
-                    break;
+                    return list.OrderBy(s => s.User.Email);
                 case SortParamEnum.User_DESC:
-                    if (isAdmin)
-                        resultList = list.OrderByDescending(s => s.User.Email).ToList();
-                    break;
+                    return list.OrderByDescending(s => s.User.Email);
                 case SortParamEnum.CreationDate_DESC:
-                    resultList = list.OrderByDescending(s => s.CreatedDate).ToList();
-                    break;
+                    return list.OrderByDescending(s => s.CreatedDate);
                 default:
-                    resultList = list.OrderBy(s => s.CardId).ToList();
-                    break;
+                    return list.OrderBy(s => s.CardId);
             }
-            return resultList;
         }
 
 
@@ -393,7 +375,7 @@ namespace WebUI.Controllers
                 diagnosticCard.CardId = "esmil7ewthiejGADFihwmjyrx8";
                 _context.Update(diagnosticCard);
                 _context.SaveChanges();
-                ViewData["ResultText"] = "Карта с номером " + id.ToString() + " отправлена на регистрацию.";
+                ViewData["ResultText"] = "Карта с номером " + id + " отправлена на регистрацию.";
             }
             return View();
         }
@@ -422,7 +404,7 @@ namespace WebUI.Controllers
             ViewData["FuelTypesList"] = new SelectList(InitFuelTypesList(), "code", "value");
             ViewData["BrakeTypesList"] = new SelectList(InitBrakeTypesList(), "code", "value");
             ViewData["DocumentTypesList"] = new SelectList(InitDocumentTypesList(), "code", "value");
-            ViewData["ManufacturesOptions"] = await InitManufacturesListForHTML();
+            ViewData["ManufacturesOptions"] = "";
         }
 
         private List<object> InitVehicleCategoryList()
@@ -464,17 +446,6 @@ namespace WebUI.Controllers
                 Enum.GetValues(typeof(DocumentTypes)).Cast<DocumentTypes>()
                     .Select(x => new { code = x, value = x.ToString() }));
             return categories;
-        }
-        public async Task<String> InitManufacturesListForHTML()
-        {
-            var result = await _api.GetAllManufacturers();
-            ManufacturerSuggestions sug = JsonConvert.DeserializeObject<ManufacturerSuggestions>(result);
-            string options = "";
-            foreach (var item in sug.Suggestions)
-            {
-                options += "<option>" + item + "</option>\r\n";
-            }
-            return options;
         }
     }
 }

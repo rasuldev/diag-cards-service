@@ -9,19 +9,18 @@ namespace WebUI.Models.AccountViewModels
     public class LoginViewModel
     {
         [Required]
-        [EmailAddress]
+        [Display(Name = "Логин/Email")]
+        //[EmailAddress]
         public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
+        [Display(Name = "Пароль")]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
+        [Display(Name = "Запомнить?")]
         public bool RememberMe { get; set; }
-
-        public string CaptchaFilename = "";
-        public string CaptchaServerPath = "";
-        public string CaptchaText = "";
-
+        [Display(Name = "Введите капчу")]
+        public string CaptchaText { get; set; }
     }
 }

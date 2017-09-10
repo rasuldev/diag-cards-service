@@ -6,6 +6,7 @@ using EaisApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Session;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using WebUI.Data;
 using WebUI.Data.Entities;
+using WebUI.Infrastructure;
 using WebUI.Infrastructure.Pagination;
 using WebUI.Models;
 using WebUI.Services;
@@ -54,7 +56,7 @@ namespace WebUI
 
             services.AddIdentity<User, IdentityRole>(options =>
             {
-                options.Cookies.ApplicationCookie.AutomaticChallenge = false;
+                options.Cookies.ApplicationCookie.AutomaticChallenge = true;
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
@@ -141,11 +143,15 @@ namespace WebUI
 
             app.UseSession();
 
+            var userManager = app.ApplicationServices.GetRequiredService<UserManager<User>>();
+            SecurityRoutines.CreateAdminUser(userManager, Configuration["admin:login"],
+                Configuration["admin:password"]).Wait();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Cards}/{action=Index}/{id?}");
             });
         }
     }

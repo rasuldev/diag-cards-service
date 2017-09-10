@@ -9,4 +9,10 @@
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.Diagnostics.TraceSource">
+      <HintPath>C:\Users\User\.nuget\packages\system.diagnostics.tracesource\4.0.0\ref\netstandard1.3\System.Diagnostics.TraceSource.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

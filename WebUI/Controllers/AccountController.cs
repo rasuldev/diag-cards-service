@@ -18,6 +18,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using EaisApi.Exceptions;
 using EaisApi;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace WebUI.Controllers
 {
@@ -57,26 +58,26 @@ namespace WebUI.Controllers
         // GET: /Account/Login
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromServices]EaistoApi _api, string returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
             // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
+            // await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
 
             LoginViewModel model = new LoginViewModel();
 
             ViewData["ReturnUrl"] = returnUrl;
             try
             {
-                var captcha = await _api.InitRemoteSession();
+                //var captcha = await _api.InitRemoteSession();
                 
-                model.CaptchaFilename = Path.GetRandomFileName() + ".jpg";
-                model.CaptchaServerPath = _hostingEnvironment.WebRootPath + "/CaptchaTempImages/" + model.CaptchaFilename;
-                //model.FullPath = Path.Combine(model.ServerPath, model.Filename);
-                using (var file = new FileStream(model.CaptchaServerPath, FileMode.Create))
-                {
-                    captcha.CopyTo(file);
-                    captcha.Dispose();
-                }
+                //model.CaptchaFilename = Path.GetRandomFileName() + ".jpg";
+                //model.CaptchaServerPath = _hostingEnvironment.WebRootPath + "/CaptchaTempImages/" + model.CaptchaFilename;
+                ////model.FullPath = Path.Combine(model.ServerPath, model.Filename);
+                //using (var file = new FileStream(model.CaptchaServerPath, FileMode.Create))
+                //{
+                //    captcha.CopyTo(file);
+                //    captcha.Dispose();
+                //}
             }
             catch (Exception ex)
             {
@@ -91,7 +92,7 @@ namespace WebUI.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, [FromServices]EaistoApi _api, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model, [FromServices] EaistoApi api, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             redirectUrl = returnUrl;
@@ -100,10 +101,13 @@ namespace WebUI.Controllers
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var user = await _userManager.FindByNameAsync(model.Email);
-                bool isExist = false;
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Неверный логин или пароль");
+                    return View(model);
+                }
                 if (user != null)
                 {
-                    isExist = true;
                     if (user.IsRemoved)
                         return View("Banned");
                     if (user.IsApproved != true)
@@ -114,11 +118,11 @@ namespace WebUI.Controllers
                 //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (checkResult.Succeeded)
                 {
-                    string login = _configuration["login"];
-                    string pass = _configuration["password"];
+                    string login = _configuration["eaisto:login"];
+                    string pass = _configuration["eaisto:password"];
                     try
                     {
-                        await _api.SignIn(login, pass, model.CaptchaText);
+                        await api.SignIn(login, pass, model.CaptchaText);
                         var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                         if (signInResult.Succeeded)
                         {
@@ -162,29 +166,10 @@ namespace WebUI.Controllers
         // GET: /Account/Register
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(string returnUrl = null)
+        public IActionResult Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            //await CreateAdminUser();
             return View();
-        }
-
-
-        private async Task CreateAdminUser()
-        {
-            var username = "admin@admin.ru";
-            var pass = "123456";
-            var user = new User { UserName = username /*, Email = model.Email */};
-            var admin = await _userManager.FindByNameAsync(username);
-            //await _userManager.DeleteAsync(admin);
-            //admin = await _userManager.FindByNameAsync(username);
-            if (admin == null)
-            {
-                //var result = await _roleManager.CreateAsync(new IdentityRole("Administrator"));                
-                var f = await _userManager.CreateAsync(user, pass);
-                await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, UserRoles.Admin, ClaimValueTypes.String));
-                //await _userManager.AddToRoleAsync(user, "Administrator");
-            }
         }
 
         //
