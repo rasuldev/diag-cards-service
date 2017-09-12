@@ -9,11 +9,11 @@
     <a asp-action="Create">Добавить новую карту</a>
 </p>
 @{
-    string errorText = (string)TempData["ErrorText"];
+    var errorText = (string)ViewData["ErrorText"];
     if (errorText != null)
     {
         <div class="alert alert-warning">
-            <strong>Внимание!</strong> @TempData["ErrorText"]
+            <strong>Внимание!</strong> @errorText
         </div>
     }
 }
@@ -27,13 +27,13 @@
         <input asp-for="Filter.StartDate" placeholder="Дата создания: от" class="form-control" />
         <input asp-for="Filter.EndDate" placeholder="Дата создания: до" class="form-control" />
 
-        @Html.DropDownList("filter", (SelectList)TempData["CardStatusEnum"], new { @class = "form-control" })
+        @Html.DropDownListFor(m => m.Filter.Status, (SelectList)ViewData["CardStatusEnum"], new { @class = "form-control" })
 
         @{
             if (User.IsInRole(UserRoles.Admin))
             {
                 <text>
-                @Html.DropDownList("userId", (SelectList)TempData["UsersList"], new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.Filter.UserId, (SelectList)ViewData["UsersList"], new { @class = "form-control" })
                 </text>
             }
         }
@@ -51,6 +51,9 @@
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CreatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegisteredDate)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().Fullname)
@@ -88,6 +91,9 @@
                     @Html.DisplayFor(modelItem => item.CreatedDate)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => item.RegisteredDate)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Fullname)
                 </td>
                 <td>
@@ -114,29 +120,29 @@
                     </td>
                 }
                 <td class="col-md-1 container actions">
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary" title="Изменить">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </a>
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Детали">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
                     </a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Удалить">
-                        <i class="fa fa-times" aria-hidden="true"></i>
-                    </a>
-                    @{
-                        bool isDayLimitReached = (bool)TempData["isDayLimitExhausted"];
+                    @if (item.IsRegistered)
+                    {
+                        <a asp-action="Create" asp-route-id="@item.Id" class="btn btn-primary" title="Создать новую на основе этой">
+                            <i class="fa fa-copy" aria-hidden="true"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary" title="Изменить">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Удалить">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </a>
+                        bool isDayLimitReached = (bool) ViewData["isDayLimitExhausted"];
                         string isDisabled = isDayLimitReached ? "disabled" : "";
-                        <a href=""  data-id="@item.Id" class="btn btn-success @isDisabled btn-register" title="Зарегистрировать">
+                        <a href="" data-id="@item.Id" class="btn btn-success @isDisabled btn-register" title="Зарегистрировать">
                             <i class="fa fa-registered" aria-hidden="true"></i>
                         </a>
                     }
-
-                    <style>
-                        .action-btn {
-                            width: 100%;
-                            margin-bottom: 5px;
-                        }
-                    </style>
                 </td>
             </tr>
                         }

@@ -89,7 +89,7 @@ namespace EaisApi.Models
         public string Note { get; set; }
 
         [DataType(DataType.Date)]
-        [Display(Name = "Срок действия")]
+        [Display(Name = "Срок действия карты")]
         public DateTime ExpirationDate { get; set; }
     }
 }

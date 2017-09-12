@@ -21,29 +21,29 @@ namespace WebUI.Controllers
             _pager = pager;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
 
         public async Task<Stream> Init()
         {
             return await _api.InitRemoteSession();
         }
 
-        public IActionResult About()
-        {
-            var page = _pager.CurrentPage;
-            ViewData["Message"] = $"Page {page}.";
-            return View();
-        }
+        //public IActionResult About()
+        //{
+        //    var page = _pager.CurrentPage;
+        //    ViewData["Message"] = $"Page {page}.";
+        //    return View();
+        //}
 
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
+        //public IActionResult Contact()
+        //{
+        //    ViewData["Message"] = "Your contact page.";
 
-            return View();
-        }
+        //    return View();
+        //}
 
         public IActionResult Error()
         {

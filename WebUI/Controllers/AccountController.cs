@@ -58,7 +58,7 @@ namespace WebUI.Controllers
         // GET: /Account/Login
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
+        public IActionResult Login(string returnUrl = null)
         {
             // Clear the existing external cookie to ensure a clean login process
             // await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
@@ -86,7 +86,6 @@ namespace WebUI.Controllers
                         
             return View(model);
         }
-        string redirectUrl;
         //
         // POST: /Account/Login
         [HttpPost]
@@ -95,7 +94,6 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Login(LoginViewModel model, [FromServices] EaistoApi api, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            redirectUrl = returnUrl;
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
@@ -106,13 +104,10 @@ namespace WebUI.Controllers
                     ModelState.AddModelError("", "Неверный логин или пароль");
                     return View(model);
                 }
-                if (user != null)
-                {
-                    if (user.IsRemoved)
-                        return View("Banned");
-                    if (user.IsApproved != true)
-                        return View("NotApproval");
-                }
+                if (user.IsRemoved)
+                    return View("Banned");
+                if (user.IsApproved != true)
+                    return View("NotApproval");
                 var checkResult = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
 
                 //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -127,12 +122,11 @@ namespace WebUI.Controllers
                         if (signInResult.Succeeded)
                         {
                             _logger.LogInformation(1, "User logged in.");
-                            return RedirectToLocal(redirectUrl);
+                            return RedirectToLocal(returnUrl);
                         }
                     }
                     catch (WrongCaptchaException e)
                     {
-                        
                         ModelState.AddModelError(string.Empty, "Вы ввели неверную каптчу.");
                     }
                     catch (Exception ex)
@@ -537,10 +531,7 @@ namespace WebUI.Controllers
             {
                 return Redirect(returnUrl);
             }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
+            return RedirectToAction(nameof(CardsController.Index), "Cards");
         }
 
         #endregion

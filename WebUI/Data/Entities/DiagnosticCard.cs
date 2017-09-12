@@ -21,5 +21,8 @@ namespace WebUI.Data.Entities
         [NotMapped]
         [Display(Name = "ФИО")]
         public string Fullname => $"{Lastname} {Firstname} {Patronymic}";
+
+        [NotMapped]
+        public bool IsRegistered => RegisteredDate != null;
     }
 }

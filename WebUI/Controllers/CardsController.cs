@@ -20,6 +20,7 @@ using EaisApi.Exceptions;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using WebUI.Infrastructure;
 using WebUI.Models.CardsViewModels;
 
 namespace WebUI.Controllers
@@ -53,15 +54,14 @@ namespace WebUI.Controllers
             var page = _pager.CurrentPage;
             var UserId = _userManager.GetUserId(User);
             isAdmin = User.IsInRole(UserRoles.Admin);
-            TempData["isDayLimitExhausted"] = isDayLimitExhausted();
+            ViewData["isDayLimitExhausted"] = isDayLimitExhausted();
 
             if (model.Filter.Status == null)
                 model.Filter.Status = CardStatusEnum.All;
 
-            TempData["CardStatusEnum"] = GetCardStatusList(model.Filter.Status);
-            TempData["CardStatusSelectedIndex"] = (int)model.Filter.Status;
-            TempData["SortBy"] = model.Filter.SortBy;
-            TempData["isAdmin"] = isAdmin;
+            ViewData["CardStatusEnum"] = Misc.CreateSelectListFrom<CardStatusEnum>(model.Filter.Status);
+            ViewData["SortBy"] = model.Filter.SortBy;
+            ViewData["isAdmin"] = isAdmin;
 
             //var card = _context.DiagnosticCards.First();
             //card.UserId = UserId;
@@ -73,15 +73,9 @@ namespace WebUI.Controllers
 
             if (isAdmin)
             {
-                string uId = "All";
-                if (!String.IsNullOrEmpty(model.Filter.UserId))
-                {
-                    uId = model.Filter.UserId;
-                    if (!model.Filter.UserId.Equals("All")) // if not All
-                        cards = cards.Where(item => item.User.Id.Equals(uId));
-                }
-                TempData["FilterUser"] = uId;
-                TempData["UsersList"] = GetUsersList(uId);
+                if (!string.IsNullOrEmpty(model.Filter.UserId))
+                    cards = cards.Where(item => item.User.Id == model.Filter.UserId);
+                ViewData["UsersList"] = GetUsersList("");
             }
 
             // Filter
@@ -125,41 +119,27 @@ namespace WebUI.Controllers
             return View(model);
         }
 
-        public SelectList GetCardStatusList(CardStatusEnum? selectedValue)
+        /// <summary>
+        /// Empty string means all users
+        /// </summary>
+        /// <param name="selectedUserId"></param>
+        /// <returns></returns>
+        public SelectList GetUsersList(string selectedUserId = "")
         {
-            List<SelectListItem> list = new List<SelectListItem>();
-            var arr = Enum.GetValues(typeof(CardStatusEnum));
-            for (int i = 0; i < arr.Length; i++)
+            var list = new List<SelectListItem>
             {
-                list.Add(new SelectListItem()
+                new SelectListItem()
                 {
-                    Text = arr.GetValue(i).ToString(),
-                    Value = i.ToString(),
-                    Selected = arr.GetValue(i).ToString().Equals(selectedValue.ToString())
-                });
-            }
-            return new SelectList(list, "Value", "Text");
-        }
-        public SelectList GetUsersList(string selectedUserId)
-        {
-            List<SelectListItem> list = new List<SelectListItem>();
-            var db = _context.User.ToList();
-            foreach (var user in db)
+                    Text = "Выберите пользователя",
+                    Value = ""
+                }
+            };
+            list.AddRange(_context.User.AsNoTracking().Select(user => new SelectListItem()
             {
-                list.Add(new SelectListItem()
-                {
-                    Text = user.Email,
-                    Value = user.Id,
-                    Selected = selectedUserId.Equals(user.Id)
-                });
-            }
-            list.Add(new SelectListItem()
-            {
-                Text = "All",
-                Value = "All",
-                Selected = selectedUserId.Equals("All")
-            });
-            return new SelectList(list, "Value", "Text");
+                Text = user.UserName,
+                Value = user.Id
+            }));
+            return new SelectList(list, "Value", "Text", selectedUserId);
         }
 
         private IQueryable<DiagnosticCard> SortList(IQueryable<DiagnosticCard> list, SortParamEnum sortBy)
@@ -204,22 +184,17 @@ namespace WebUI.Controllers
         // GET: Cards/Create
         public async Task<IActionResult> Create(int? Id)
         {
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
-            CreateOrEditInit();
-            if (Id != null)
+            if (Id == null)
             {
-                var diagnosticCard = _context.DiagnosticCards
+                CreateOrEditInit();
+                return View();
+            }
+
+            var diagnosticCard = _context.DiagnosticCards
                 .Include(d => d.User)
                 .SingleOrDefault(m => m.Id == Id);
-                if (diagnosticCard?.RegisteredDate != null)
-                {
-                    diagnosticCard.CreatedDate = DateTime.Now;
-                    return View(diagnosticCard);
-                }
-                else
-                    return RedirectToAction("Index", "Cards");
-            }
-            return View();
+            CreateOrEditInit(diagnosticCard);
+            return View(diagnosticCard);
         }
 
         // POST: Cards/Create
@@ -235,6 +210,7 @@ namespace WebUI.Controllers
                 diagnosticCard.UserId = _userManager.GetUserId(User);
                 diagnosticCard.CardId = null;
                 diagnosticCard.RegisteredDate = null;
+                diagnosticCard.CreatedDate = DateTime.Now;
 
                 _context.Add(diagnosticCard);
                 var f = await _context.SaveChangesAsync();
@@ -345,12 +321,12 @@ namespace WebUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Search(string vin, string regNumber, string ticketSeries, string ticketNumber, string bodyNumber, string frameNumber)
         {
-            vin = prepareParameter(vin);
-            regNumber = prepareParameter(regNumber);
-            ticketSeries = prepareParameter(ticketSeries);
-            ticketNumber = prepareParameter(ticketNumber);
-            bodyNumber = prepareParameter(bodyNumber);
-            frameNumber = prepareParameter(frameNumber);
+            vin = PrepareParameter(vin);
+            regNumber = PrepareParameter(regNumber);
+            ticketSeries = PrepareParameter(ticketSeries);
+            ticketNumber = PrepareParameter(ticketNumber);
+            bodyNumber = PrepareParameter(bodyNumber);
+            frameNumber = PrepareParameter(frameNumber);
 
             // Method is not working
             string result = await _api.Search(vin, regNumber, ticketSeries, ticketNumber, bodyNumber, frameNumber);
@@ -358,7 +334,7 @@ namespace WebUI.Controllers
             return View();
         }
 
-        public string prepareParameter(string par)
+        public string PrepareParameter(string par)
         {
             return par.Replace(" ", "").Length > 1 ? par : null;
         }
@@ -377,7 +353,6 @@ namespace WebUI.Controllers
                 return RedirectToAction("Index");
             }
             
-            // TODO: Save Card
             var diagnosticCard = _context.DiagnosticCards.SingleOrDefault(m => m.Id == id);
             if (diagnosticCard.UserId != _userManager.GetUserId(User))
             {
@@ -430,55 +405,14 @@ namespace WebUI.Controllers
             return _context.DiagnosticCards.Any(e => e.Id == id);
         }
 
-        private async void CreateOrEditInit()
+        private void CreateOrEditInit(EaisApi.Models.DiagnosticCard diagnosticCard = null)
         {
-            ViewData["CategoriesList"] = new SelectList(InitVehicleCategoryList(), "code", "value");
-            ViewData["CategoryCommonList"] = new SelectList(InitVehicleCategoryCommonList(), "code", "value");
-            ViewData["FuelTypesList"] = new SelectList(InitFuelTypesList(), "code", "value");
-            ViewData["BrakeTypesList"] = new SelectList(InitBrakeTypesList(), "code", "value");
-            ViewData["DocumentTypesList"] = new SelectList(InitDocumentTypesList(), "code", "value");
+            ViewData["CategoriesList"] = Misc.CreateSelectListFrom<VehicleCategory>(diagnosticCard?.Category);
+            ViewData["CategoryCommonList"] = Misc.CreateSelectListFrom<VehicleCategoryCommon>(diagnosticCard?.CategoryCommon);
+            ViewData["FuelTypesList"] = Misc.CreateSelectListFrom<FuelTypes>(diagnosticCard?.FuelType);
+            ViewData["BrakeTypesList"] = Misc.CreateSelectListFrom<BrakeTypes>(diagnosticCard?.BrakeType);
+            ViewData["DocumentTypesList"] = Misc.CreateSelectListFrom<DocumentTypes>(diagnosticCard?.DocumentType);
             ViewData["ManufacturesOptions"] = "";
-        }
-
-        private List<object> InitVehicleCategoryList()
-        {
-            var categories = new List<object>() { new { code = "", value = "" } };
-            categories.AddRange(
-                Enum.GetValues(typeof(VehicleCategory)).Cast<VehicleCategory>()
-                    .Select(x => new { code = x, value = x.ToString() }));
-            return categories;
-        }
-        private List<object> InitVehicleCategoryCommonList()
-        {
-            var categories = new List<object>() { new { code = "", value = "" } };
-            categories.AddRange(
-                Enum.GetValues(typeof(VehicleCategoryCommon)).Cast<VehicleCategoryCommon>()
-                    .Select(x => new { code = x, value = x.ToString() }));
-            return categories;
-        }
-        private List<object> InitFuelTypesList()
-        {
-            var categories = new List<object>() { new { code = "", value = "" } };
-            categories.AddRange(
-                Enum.GetValues(typeof(FuelTypes)).Cast<FuelTypes>()
-                    .Select(x => new { code = x, value = x.ToString() }));
-            return categories;
-        }
-        private List<object> InitBrakeTypesList()
-        {
-            var categories = new List<object>() { new { code = "", value = "" } };
-            categories.AddRange(
-                Enum.GetValues(typeof(BrakeTypes)).Cast<BrakeTypes>()
-                    .Select(x => new { code = x, value = x.ToString() }));
-            return categories;
-        }
-        private List<object> InitDocumentTypesList()
-        {
-            var categories = new List<object>() { new { code = "", value = "" } };
-            categories.AddRange(
-                Enum.GetValues(typeof(DocumentTypes)).Cast<DocumentTypes>()
-                    .Select(x => new { code = x, value = x.ToString() }));
-            return categories;
         }
     }
 }
