@@ -3,6 +3,8 @@
 
 WebUI/conf.json
 WebUI/wwwroot/CaptchaTempImages/*
+WebUI/wwwroot/css/site.min.css
+WebUI/wwwroot/js/site.min.js
 
 # User-specific files
 *.suo
