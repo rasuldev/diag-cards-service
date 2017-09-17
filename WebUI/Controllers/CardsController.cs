@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using EaisApi.Models;
@@ -13,10 +14,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using WebUI.Data.Entities;
 using System.Security.Claims;
+using CsQuery.ExtensionMethods;
 using Microsoft.AspNetCore.Routing;
 using WebUI.Infrastructure.Pagination;
 using EaisApi;
 using EaisApi.Exceptions;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -35,10 +38,10 @@ namespace WebUI.Controllers
         readonly EaistoApi _api;
         readonly IConfiguration _conf;
         private readonly ILogger<CardsController> _logger;
+        private readonly SignInManager<User> _signInManager;
 
 
-
-        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf, ILogger<CardsController> logger)
+        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf, ILogger<CardsController> logger, SignInManager<User> signInManager)
         {
             _context = context;
             _userManager = userManager;
@@ -46,6 +49,7 @@ namespace WebUI.Controllers
             _api = api;
             _conf = conf;
             _logger = logger;
+            _signInManager = signInManager;
         }
 
         // GET: Cards
@@ -54,7 +58,7 @@ namespace WebUI.Controllers
             var page = _pager.CurrentPage;
             var UserId = _userManager.GetUserId(User);
             isAdmin = User.IsInRole(UserRoles.Admin);
-            ViewData["isDayLimitExhausted"] = isDayLimitExhausted();
+            ViewData["isDayLimitExhausted"] = IsDayLimitExceeded();
 
             if (model.Filter.Status == null)
                 model.Filter.Status = CardStatusEnum.All;
@@ -202,23 +206,49 @@ namespace WebUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,Id,CardId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate")] DiagnosticCard diagnosticCard)
+        public async Task<IActionResult> Create([Bind("UserId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate")] DiagnosticCard diagnosticCard, bool register = false)
         {
             if (ModelState.IsValid)
             {
-                diagnosticCard.Id = 0;
+                //diagnosticCard.Id = 0;
                 diagnosticCard.UserId = _userManager.GetUserId(User);
-                diagnosticCard.CardId = null;
-                diagnosticCard.RegisteredDate = null;
+                //diagnosticCard.CardId = null;
+                //diagnosticCard.RegisteredDate = null;
                 diagnosticCard.CreatedDate = DateTime.Now;
-
+                //diagnosticCard.VIN = diagnosticCard.VIN?.ToUpper();
                 _context.Add(diagnosticCard);
-                var f = await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                await _context.SaveChangesAsync();
+                if (!register) return RedirectToAction("Index");
+                try
+                {
+                    await RegisterCard(diagnosticCard.Id);
+                    TempData["MessageText"] =
+                        $"Карта {diagnosticCard.Id} (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО";
+                    return RedirectToAction("Index");
+                }
+                catch (RegisterCardException e)
+                {
+                    TempData["ErrorText"] = e.Message;
+                    TempData["MessageText"] =
+                        "Карта сохранена как черновик. Вы можете попытаться отправить ее на регистрацию еще раз несколько позже.";
+                    return RedirectToAction("Edit", new {id = diagnosticCard.Id});
+                }
+                catch (NotAuthorizedException)
+                {
+                    return await Logout();
+                }
             }
 
             CreateOrEditInit();
             return View(diagnosticCard);
+        }
+
+        private async Task<IActionResult> Logout()
+        {
+            TempData["ErrorText"] = "На ЕАИСТО истекла ваша сессия. Войдите еще раз для возобновления сессии.";
+            await _signInManager.SignOutAsync();
+            var returnUrl = Request.GetUri().PathAndQuery;
+            return RedirectToAction("Login", "Account", new {returnUrl});
         }
 
         // GET: Cards/Edit/5
@@ -246,7 +276,7 @@ namespace WebUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,Id,CardId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate")] DiagnosticCard diagnosticCard)
+        public async Task<IActionResult> Edit(int id, [Bind("UserId,Id,CardId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate")] DiagnosticCard diagnosticCard, bool register = false)
         {
             CreateOrEditInit();
             if (id != diagnosticCard.Id)
@@ -272,9 +302,26 @@ namespace WebUI.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Index");
+                if (!register) return RedirectToAction("Index");
+                try
+                {
+                    await RegisterCard(diagnosticCard.Id);
+                    TempData["MessageText"] =
+                        $"Карта {diagnosticCard.Id} (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО";
+                    return RedirectToAction("Index");
+                }
+                catch (RegisterCardException e)
+                {
+                    TempData["ErrorText"] = e.Message;
+                    TempData["MessageText"] =
+                        "Изменения сохранены. Вы можете попытаться отправить карту на регистрацию еще раз несколько позже.";
+                    return RedirectToAction("Edit", new {id = diagnosticCard.Id});
+                }
+                catch (NotAuthorizedException)
+                {
+                    return await Logout();
+                }
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", diagnosticCard.UserId);
             return View(diagnosticCard);
         }
 
@@ -312,26 +359,19 @@ namespace WebUI.Controllers
             return RedirectToAction("Index");
         }
 
-        // GET: Cards/Delete/5
-        public IActionResult Search()
+        [HttpGet]
+        public async Task<IActionResult> Search(SearchFilterModel filter)
         {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Search(string vin, string regNumber, string ticketSeries, string ticketNumber, string bodyNumber, string frameNumber)
-        {
-            vin = PrepareParameter(vin);
-            regNumber = PrepareParameter(regNumber);
-            ticketSeries = PrepareParameter(ticketSeries);
-            ticketNumber = PrepareParameter(ticketNumber);
-            bodyNumber = PrepareParameter(bodyNumber);
-            frameNumber = PrepareParameter(frameNumber);
+            //vin = PrepareParameter(vin);
+            //regNumber = PrepareParameter(regNumber);
+            //ticketSeries = PrepareParameter(ticketSeries);
+            //ticketNumber = PrepareParameter(ticketNumber);
+            //bodyNumber = PrepareParameter(bodyNumber);
+            //frameNumber = PrepareParameter(frameNumber);
 
             // Method is not working
-            string result = await _api.Search(vin, regNumber, ticketSeries, ticketNumber, bodyNumber, frameNumber);
-            ViewData["Result"] = result;
-            return View();
+            string result = await _api.Search(filter.Vin, filter.RegNumber, filter.TicketSeries, filter.TicketNumber, filter.BodyNumber, filter.FrameNumber);
+            return View(filter);
         }
 
         public string PrepareParameter(string par)
@@ -339,57 +379,59 @@ namespace WebUI.Controllers
             return par.Replace(" ", "").Length > 1 ? par : null;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(int? id)
+        //[HttpPost("register")]
+        private async Task<IActionResult> Register(int? id)
         {
             if (id == null)
             {
                 return RedirectToAction("Index");
             }
-
-            if (isDayLimitExhausted())
-            {
-                TempData["ErrorText"] = "Лимит регистраций на сегодня исчерпан.";
-                return RedirectToAction("Index");
-            }
-            
-            var diagnosticCard = _context.DiagnosticCards.SingleOrDefault(m => m.Id == id);
-            if (diagnosticCard.UserId != _userManager.GetUserId(User))
-            {
-                TempData["ErrorText"] = "Это карта принадлежит другому пользователю";
-                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to register card with id={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
-                return RedirectToAction("Index");
-            }
-
             try
             {
-                var cardId = await _api.SaveCard(diagnosticCard);
-                diagnosticCard.CardId = cardId;
-                diagnosticCard.RegisteredDate = DateTime.Now;
-                _context.Update(diagnosticCard);
-                _context.SaveChanges();
-                TempData["ResultText"] = "Карта с номером " + id + " отправлена на регистрацию.";
+                await RegisterCard(id.Value);
             }
-            catch (CheckCardException e)
+            catch (RegisterCardException e)
             {
+                TempData["ErrorText"] = e.Message;
+            }
+            catch (Exception e)
+            {
+                TempData["ErrorText"] = "При регистрации карты в ЕАИСТО произошла ошибка.";
                 _logger.LogError(e.ToString());
-                switch (e.CheckResult)
-                {
-                    case CheckResults.CouponAlreadyExists:
-                    case CheckResults.DuplicateToday:
-                        TempData["ErrorText"] =
-                            "Сегодня уже были сохранены результаты ТО на ТС с указанным VIN и Государственным регистрационным знаком";
-                        break;
-                    default:
-                        TempData["ErrorText"] = "При регистрации произошла ошибка. Попробуйте еще раз позже.";
-                        break;
-                }
             }
             return RedirectToAction("Index");
         }
 
+        [HttpGet("cards/lastrunning/{vin}")]
+        [Produces("application/json")]
+        public async Task<string> GetVehicleRunning(string vin)
+        {
+            try
+            {
+                var runningInfo = await _api.GetVehicleRunning(vin);
+                if (runningInfo == null) return new { error = "no info" }.ToJSON();
+                return new {running = runningInfo.Running, date = runningInfo.Date}.ToJSON();
+            }
+            catch (NotAuthorizedException e)
+            {
+                return "{ \"error\": \"session expired\" }";
+            }
+            catch (Exception e)
+            {
+                return "{ \"error\": \"unknown error\" }";
+            }
+        }
 
-        private bool isDayLimitExhausted()
+        [HttpGet("cards/touch")]
+        [Produces("text/plain")]
+        public string ProlongSession()
+        {
+            // Fire and forget (so we don't use await)
+            _api.ProlongSession();
+            return "";
+        }
+
+        private bool IsDayLimitExceeded()
         {
             int limit = _conf.GetValue<int>("DayLimit");
             DateTime DateTimeNow = DateTime.Now;
@@ -407,12 +449,63 @@ namespace WebUI.Controllers
 
         private void CreateOrEditInit(EaisApi.Models.DiagnosticCard diagnosticCard = null)
         {
-            ViewData["CategoriesList"] = Misc.CreateSelectListFrom<VehicleCategory>(diagnosticCard?.Category);
-            ViewData["CategoryCommonList"] = Misc.CreateSelectListFrom<VehicleCategoryCommon>(diagnosticCard?.CategoryCommon);
-            ViewData["FuelTypesList"] = Misc.CreateSelectListFrom<FuelTypes>(diagnosticCard?.FuelType);
-            ViewData["BrakeTypesList"] = Misc.CreateSelectListFrom<BrakeTypes>(diagnosticCard?.BrakeType);
-            ViewData["DocumentTypesList"] = Misc.CreateSelectListFrom<DocumentTypes>(diagnosticCard?.DocumentType);
+            if (IsDayLimitExceeded())
+                ViewData["LimitExceeded"] = true;
+
+            ViewData["CategoriesList"] = Misc.CreateSelectListFrom<VehicleCategory>(diagnosticCard?.Category, "");
+            ViewData["CategoryCommonList"] = Misc.CreateSelectListFrom<VehicleCategoryCommon>(diagnosticCard?.CategoryCommon, "");
+            ViewData["FuelTypesList"] = Misc.CreateSelectListFrom<FuelTypes>(diagnosticCard?.FuelType, "");
+            ViewData["BrakeTypesList"] = Misc.CreateSelectListFrom<BrakeTypes>(diagnosticCard?.BrakeType, "");
+            ViewData["DocumentTypesList"] = Misc.CreateSelectListFrom<DocumentTypes>(diagnosticCard?.DocumentType, "");
             ViewData["ManufacturesOptions"] = "";
+        }
+
+        private async Task RegisterCard(int id)
+        {
+            if (IsDayLimitExceeded())
+            {
+                throw new RegisterCardException("Лимит регистраций на сегодня исчерпан.");
+            }
+
+            var diagnosticCard = _context.DiagnosticCards.SingleOrDefault(m => m.Id == id);
+            if (diagnosticCard.UserId != _userManager.GetUserId(User))
+            {
+                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to register card with cardId={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
+                throw new RegisterCardException("Это карта принадлежит другому пользователю.");
+            }
+
+            try
+            {
+                var cardId = await _api.SaveCard(diagnosticCard);
+                diagnosticCard.CardId = cardId;
+                diagnosticCard.RegisteredDate = DateTime.Now;
+                _context.Update(diagnosticCard);
+                _context.SaveChanges();
+                //TempData["ResultText"] = "Карта с номером " + id + " отправлена на регистрацию.";
+            }
+            catch (NotAuthorizedException)
+            {
+                throw;
+            }
+            catch (CheckCardException e)
+            {
+                _logger.LogError(e.ToString());
+                switch (e.CheckResult)
+                {
+                    case CheckResults.CouponAlreadyExists:
+                    case CheckResults.DuplicateToday:
+                        throw new RegisterCardException(
+                            "Сегодня уже были сохранены результаты ТО на ТС с указанным VIN и Государственным регистрационным знаком.");
+                    default:
+                        throw new RegisterCardException(
+                            "При регистрации карты в ЕАИСТО произошла ошибка. Попробуйте еще раз позже.");
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+                throw new RegisterCardException("При регистрации карты в ЕАИСТО произошла ошибка! Попробуйте еще раз позже.");
+            }
         }
     }
 }

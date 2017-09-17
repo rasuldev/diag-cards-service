@@ -96,6 +96,32 @@ namespace EaisApi
             //}
         }
 
+        /// <summary>
+        /// It should be used for prolong session on EAISTO.
+        /// </summary>
+        /// <returns></returns>
+        public async Task ProlongSession()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, DataUrl);
+            SetSessionCookie(request);
+            var response = await Client.SendAsync(request);
+        }
+        
+        public async Task<bool> IsSessionExpired()
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, DataUrl);
+                SetSessionCookie(request);
+                var response = await Client.SendAsync(request);
+                return sessionIsExpired(response);
+            }
+            catch (NotAuthorizedException)
+            {
+                return true;
+            }
+        }
+
         //private static string GenerateUniqueFilename()
         //{
         //    //var name = Path.GetFileNameWithoutExtension(filename);
@@ -197,11 +223,11 @@ namespace EaisApi
                 throw new NotAuthorizedException();
             }
             var json = await response.Content.ReadAsStringAsync();
-            if (string.IsNullOrEmpty(json.Trim()))
+            if (string.IsNullOrEmpty(json.Trim()) || json == "[]")
                 return null;
             var info = JsonConvert.DeserializeObject<List<VehicleRunningInfo>>(json, new JsonSerializerSettings()
             {
-                DateFormatString = "yyyyMMdd000000"
+                DateFormatString = "yyyyMMddhhmmss"
             });
 
             return info.FirstOrDefault();

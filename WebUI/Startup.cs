@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using EaisApi;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Session;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +22,7 @@ using WebUI.Data.Entities;
 using WebUI.Infrastructure;
 using WebUI.Infrastructure.Pagination;
 using WebUI.Models;
+using WebUI.Resources;
 using WebUI.Services;
 
 namespace WebUI
@@ -68,7 +71,9 @@ namespace WebUI
 
             services.AddPager();
 
-            services.AddMvc();
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.AddMvc().AddDataAnnotationsLocalization(
+            options => options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResource)));
 
             services.AddSingleton<IConfiguration>(Configuration);
 
@@ -104,6 +109,20 @@ namespace WebUI
             loggerFactory.AddNLog();
             //add NLog.Web
             app.AddNLogWeb();
+
+            var supportedCultures = new List<CultureInfo>
+            {
+                new CultureInfo("ru-RU")
+            };
+
+            var options = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("ru-RU"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures,
+            };
+
+            app.UseRequestLocalization(options);
 
             if (env.IsDevelopment())
             {

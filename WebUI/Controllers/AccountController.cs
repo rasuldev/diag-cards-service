@@ -127,11 +127,11 @@ namespace WebUI.Controllers
                     }
                     catch (WrongCaptchaException e)
                     {
-                        ModelState.AddModelError(string.Empty, "Вы ввели неверную каптчу.");
+                        ModelState.AddModelError(string.Empty, "Неверно введен текст с картинки.");
                     }
                     catch (Exception ex)
                     {
-                        ModelState.AddModelError(string.Empty, ex.Message);
+                        ModelState.AddModelError(string.Empty, "При соединении с сервером ЕАИСТО произошла ошибка. Попробуйте еще раз.");
                     }
                     return View(model);
                 }

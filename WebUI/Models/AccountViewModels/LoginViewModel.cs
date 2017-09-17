@@ -20,7 +20,7 @@ namespace WebUI.Models.AccountViewModels
 
         [Display(Name = "Запомнить?")]
         public bool RememberMe { get; set; }
-        [Display(Name = "Введите капчу")]
+        [Display(Name = "Введите текст с картинки")]
         public string CaptchaText { get; set; }
     }
 }

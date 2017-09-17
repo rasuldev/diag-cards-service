@@ -1,18 +1,18 @@
+﻿@using WebUI.Models.CardsViewModels
+@model WebUI.Models.CardsViewModels.SearchFilterModel
 @{
     ViewData["Title"] = "Search";
 }
 
 <h2>Search</h2>
 
-@ViewData["Result"]
 
-@using (Html.BeginForm())
-{
-    <input name="vin" type="text" />
-    <input name="regNumber" type="text" />
-    <input name="ticketSeries" type="text" />
-    <input name="ticketNumber" type="text" />
-    <input name="bodyNumber" type="text" />
-    <input name="frameNumber" type="text" />
-    <input type="submit" value="Search" />
-}
+<form asp-action="Search" class="form-inline" method="get">
+    <input class="form-control" placeholder="VIN" asp-for="Vin" type="text" />
+    <input class="form-control" placeholder="Регистрационный знак" asp-for="RegNumber" type="text" />
+    <input class="form-control" placeholder="Серия талона ТО" asp-for="TicketSeries" type="text" />
+    <input class="form-control" placeholder="Номер талона ТО" asp-for="TicketNumber" type="text" />
+    <input class="form-control" placeholder="Номер кузова" asp-for="BodyNumber" type="text" />
+    <input class="form-control" placeholder="Номер шасси" asp-for="FrameNumber" type="text" />
+    <input type="submit" value="Поиск" class="btn btn-warning" />
+</form>

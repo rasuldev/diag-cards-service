@@ -57,3 +57,17 @@ td.actions a.btn {
     width: 30px;
     padding: 6px;
 }
+
+.input-uppercase input {
+    text-transform: uppercase
+}
+
+.tooltip-inner {
+    max-width: 350px;
+    /* If max-width does not work, try using width instead */
+    width: 350px;
+}
+
+.input-group .tooltip.right {
+    margin-left: 39px;
+}
