@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using EaisApi.Models;
@@ -100,7 +101,7 @@ namespace WebUI.Controllers
             if (model.Filter.StartDate != null)
                 cards = cards.Where(item => item.CreatedDate > model.Filter.StartDate);
             if (model.Filter.EndDate != null)
-                cards = cards.Where(item => item.CreatedDate < model.Filter.EndDate);
+                cards = cards.Where(item => item.CreatedDate < model.Filter.StartDate);
 
             if (!string.IsNullOrEmpty(model.Filter.Regnumber))
                 cards = cards.Where(item => item.RegNumber.Contains(model.Filter.Regnumber));

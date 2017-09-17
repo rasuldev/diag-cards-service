@@ -86,7 +86,7 @@ namespace EaisApi.Models
         public string DocumentSeries { get; set; }
         [Required(ErrorMessage = "Required"), Display(Name = "Номер"), StringLength(6)]
         public string DocumentNumber { get; set; }
-        [DataType(DataType.Date)]
+        [DataType(DataType.Text)]
         [Required(ErrorMessage = "Required"), Display(Name = "Дата выдачи")]
         public DateTime DocumentIssueDate { get; set; }
         [Required(ErrorMessage = "Required"), Display(Name = "Выдан кем"), MaxLength(50)]
@@ -96,7 +96,7 @@ namespace EaisApi.Models
         public string Note { get; set; }
 
         [Required(ErrorMessage = "Required")]
-        [DataType(DataType.Date)]
+        [DataType(DataType.Text)]
         [Display(Name = "Срок действия карты")]
         public DateTime ExpirationDate { get; set; }
     }

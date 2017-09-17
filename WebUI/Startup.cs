@@ -72,8 +72,9 @@ namespace WebUI
             services.AddPager();
 
             services.AddLocalization(options => options.ResourcesPath = "Resources");
-            services.AddMvc().AddDataAnnotationsLocalization(
-            options => options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResource)));
+            services.AddMvc(options => options.ModelBinderProviders.Insert(0, new DateModelBinderProvider()))
+                .AddDataAnnotationsLocalization(
+                    options => options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResource)));
 
             services.AddSingleton<IConfiguration>(Configuration);
 
@@ -170,7 +171,7 @@ namespace WebUI
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Cards}/{action=Index}/{id?}");
+                    template: "{controller=Cards}/{action=Create}/{id?}");
             });
         }
     }

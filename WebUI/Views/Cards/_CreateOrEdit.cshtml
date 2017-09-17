@@ -2,6 +2,122 @@
 
 <div class="form-horizontal">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <h3>Сведения о ТС</h3>
+    <div class="form-group">
+        <label asp-for="RegNumber" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="RegNumber" class="form-control" maxlength="10"
+                   data-toggle="tooltip"
+                   title="Государственный регистрационный знак. Например, К388ХЕ199"
+                   data-placement="right" />
+            <span asp-validation-for="RegNumber" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="VIN" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <div class="input-group" style="width: 280px">
+                <input asp-for="VIN" class="form-control" maxlength="17" di
+                       data-toggle="tooltip" data-placement="right"
+                       title="VIN номер должен содержать 17 знаков, среди которых только буквы (A-Z|А-Я) и цифры (0-9)." />
+                <div class="input-group-btn">
+                    <button class="btn btn-default absent" data-for="VIN" type="button" title="Нажмите, если VIN отсутствует">
+                        <i class="glyphicon glyphicon-ban-circle"></i>
+                    </button>
+                </div>
+            </div>
+            <span asp-validation-for="VIN" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Manufacturer" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Manufacturer" class="form-control" list="manufactureNames" />
+            <datalist id="manufactureNames">
+                @Html.Raw(ViewData["ManufacturesOptions"])
+            </datalist>
+            <span asp-validation-for="Manufacturer" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Model" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Model" class="form-control" />
+            <span asp-validation-for="Model" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Category" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <select asp-for="Category" asp-items="ViewBag.CategoriesList" class="form-control"></select>
+            <span asp-validation-for="Category" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="CategoryCommon" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <select asp-for="CategoryCommon" asp-items="ViewBag.CategoryCommonList" class="form-control"></select>
+            <span asp-validation-for="CategoryCommon" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="IssueYear" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="IssueYear" class="form-control" maxlength="4" />
+            <span asp-validation-for="IssueYear" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="FrameNumber" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <div class="input-group" style="width: 280px">
+                <input asp-for="FrameNumber" class="form-control"
+                       data-toggle="tooltip"
+                       title="Если номера шасси нет, нажмите кнопку 'отсутствует'"
+                       data-placement="right" />
+                <div class="input-group-btn">
+                    <button class="btn btn-default absent" data-for="FrameNumber" type="button" title="Нажмите, если номер шасси отсутствует">
+                        <i class="glyphicon glyphicon-ban-circle"></i>
+                    </button>
+                </div>
+            </div>
+            <span asp-validation-for="FrameNumber" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="BodyNumber" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <div class="input-group" style="width: 280px">
+                <input asp-for="BodyNumber" class="form-control"
+                       data-toggle="tooltip"
+                       title="Если номера кузова нет, нажмите кнопку 'отсутствует'"
+                       data-placement="right" />
+                <div class="input-group-btn">
+                    <button class="btn btn-default absent" data-for="BodyNumber" type="button" title="Нажмите, если номер кузова отсутствует">
+                        <i class="glyphicon glyphicon-ban-circle"></i>
+                    </button>
+                </div>
+            </div>
+            <span asp-validation-for="BodyNumber" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="AllowedMaxWeight" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="AllowedMaxWeight" class="form-control" />
+            <span asp-validation-for="AllowedMaxWeight" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Weight" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Weight" class="form-control" />
+            <span asp-validation-for="Weight" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    <h3>ФИО собственника</h3>
     <div class="form-group">
         <label asp-for="Lastname" class="col-md-2 control-label"></label>
         <div class="col-md-10">
@@ -32,81 +148,56 @@
             <span asp-validation-for="Patronymic" class="text-danger"></span>
         </div>
     </div>
+
+<h3>Сведение о документе</h3>
+<div class="form-group">
+    <label asp-for="DocumentType" class="col-md-2 control-label"></label>
+    <div class="col-md-10">
+        <select asp-for="DocumentType" asp-items="ViewBag.DocumentTypesList" class="form-control"></select>
+        <span asp-validation-for="DocumentType" class="text-danger"></span>
+    </div>
+</div>
+<div class="form-group">
+    <label for="IsForeigner" class="col-md-2 control-label">Собственник</label>
+    <div class="col-md-10">
+        <div>
+            <input asp-for="IsForeigner"/>
+            <label for="IsForeigner" class="control-label">Иностранный гражданин</label>
+        </div>
+    </div>
+</div>
     <div class="form-group">
-        <label asp-for="VIN" class="col-md-2 control-label"></label>
+        <label asp-for="DocumentSeries" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <div class="input-group" style="width: 280px">
-                <input asp-for="VIN" class="form-control" maxlength="17" di
-                       data-toggle="tooltip" data-placement="right"
-                       title="VIN номер должен содержать 17 знаков, среди которых только буквы (A-Z|А-Я) и цифры (0-9)." />
-                <div class="input-group-btn">
-                    <button class="btn btn-default absent" data-for="VIN" type="button" title="Нажмите, если VIN отсутствует">
-                        <i class="glyphicon glyphicon-ban-circle"></i>
-                    </button>
-                </div>
-            </div>
-            <span asp-validation-for="VIN" class="text-danger"></span>
+            <input asp-for="DocumentSeries" class="form-control" maxlength="4" />
+            <span asp-validation-for="DocumentSeries" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
-        <label asp-for="IssueYear" class="col-md-2 control-label"></label>
+        <label asp-for="DocumentNumber" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <input asp-for="IssueYear" class="form-control" maxlength="4" />
-            <span asp-validation-for="IssueYear" class="text-danger"></span>
+            <input asp-for="DocumentNumber" class="form-control" maxlength="6" />
+            <span asp-validation-for="DocumentNumber" class="text-danger"></span>
         </div>
     </div>
     <div class="form-group">
-        <label asp-for="Manufacturer" class="col-md-2 control-label"></label>
+        <label asp-for="DocumentIssueDate" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <input asp-for="Manufacturer" class="form-control" list="manufactureNames" />
-            <datalist id="manufactureNames">
-                @Html.Raw(ViewData["ManufacturesOptions"])
-            </datalist>
-            <span asp-validation-for="Manufacturer" class="text-danger"></span>
+            <input asp-for="DocumentIssueDate" class="form-control" />
+            <span asp-validation-for="DocumentIssueDate" class="text-danger"></span>
         </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Model" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="Model" class="form-control" />
-            <span asp-validation-for="Model" class="text-danger"></span>
-        </div>
+<div class="form-group">
+    <label asp-for="DocumentIssuer" class="col-md-2 control-label"></label>
+    <div class="col-md-10">
+        <input asp-for="DocumentIssuer" class="form-control" />
+        <span asp-validation-for="DocumentIssuer" class="text-danger"></span>
     </div>
-    <div class="form-group">
-        <label asp-for="BodyNumber" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <div class="input-group" style="width: 280px">
-                <input asp-for="BodyNumber" class="form-control"
-                       data-toggle="tooltip"
-                       title="Если номера кузова нет, нажмите кнопку 'отсутствует'"
-                       data-placement="right" />
-                <div class="input-group-btn">
-                    <button class="btn btn-default absent" data-for="BodyNumber" type="button" title="Нажмите, если номер кузова отсутствует">
-                        <i class="glyphicon glyphicon-ban-circle"></i>
-                    </button>
-                </div>
-            </div>
-            <span asp-validation-for="BodyNumber" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="FrameNumber" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <div class="input-group" style="width: 280px">
-                <input asp-for="FrameNumber" class="form-control"
-                       data-toggle="tooltip"
-                       title="Если номера шасси нет, нажмите кнопку 'отсутствует'"
-                       data-placement="right" />
-                <div class="input-group-btn">
-                    <button class="btn btn-default absent" data-for="FrameNumber" type="button" title="Нажмите, если номер шасси отсутствует">
-                        <i class="glyphicon glyphicon-ban-circle"></i>
-                    </button>
-                </div>
-            </div>
-            <span asp-validation-for="FrameNumber" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
+</div>
+    
+    
+<h3>Другие данные ТС</h3>
+<div class="form-group">
         <label asp-for="Running" class="col-md-2 control-label"></label>
         <div class="col-md-10">
             <input asp-for="Running" class="form-control"
@@ -120,37 +211,7 @@
             </div>
         </div>
     </div>
-    <div class="form-group">
-        <label asp-for="RegNumber" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="RegNumber" class="form-control" maxlength="10"
-                   data-toggle="tooltip"
-                   title="Государственный регистрационный знак. Например, К388ХЕ199"
-                   data-placement="right" />
-            <span asp-validation-for="RegNumber" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="Weight" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="Weight" class="form-control" />
-            <span asp-validation-for="Weight" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="Category" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <select asp-for="Category" asp-items="ViewBag.CategoriesList" class="form-control"></select>
-            <span asp-validation-for="Category" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="CategoryCommon" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <select asp-for="CategoryCommon" asp-items="ViewBag.CategoryCommonList" class="form-control"></select>
-            <span asp-validation-for="CategoryCommon" class="text-danger"></span>
-        </div>
-    </div>
+
     <div class="form-group">
         <label asp-for="TyreManufacturer" class="col-md-2 control-label"></label>
         <div class="col-md-10">
@@ -158,13 +219,7 @@
             <span asp-validation-for="TyreManufacturer" class="text-danger"></span>
         </div>
     </div>
-    <div class="form-group">
-        <label asp-for="AllowedMaxWeight" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="AllowedMaxWeight" class="form-control" />
-            <span asp-validation-for="AllowedMaxWeight" class="text-danger"></span>
-        </div>
-    </div>
+
     <div class="form-group">
         <label asp-for="FuelType" class="col-md-2 control-label"></label>
         <div class="col-md-10">
@@ -179,49 +234,8 @@
             <span asp-validation-for="BrakeType" class="text-danger"></span>
         </div>
     </div>
-    <div class="form-group">
-        <label asp-for="DocumentType" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <select asp-for="DocumentType" asp-items="ViewBag.DocumentTypesList" class="form-control"></select>
-            <span asp-validation-for="DocumentType" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <div class="checkbox">
-                <input asp-for="IsForeigner" />
-                <label asp-for="IsForeigner"></label>
-            </div>
-        </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="DocumentSeries" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="DocumentSeries" class="form-control" />
-            <span asp-validation-for="DocumentSeries" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="DocumentNumber" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="DocumentNumber" class="form-control" />
-            <span asp-validation-for="DocumentNumber" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="DocumentIssueDate" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="DocumentIssueDate" class="form-control" />
-            <span asp-validation-for="DocumentIssueDate" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="DocumentIssuer" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-            <input asp-for="DocumentIssuer" class="form-control" />
-            <span asp-validation-for="DocumentIssuer" class="text-danger"></span>
-        </div>
-    </div>
+    
+<h3>Заключительная информация</h3>
     <div class="form-group">
         <label asp-for="Note" class="col-md-2 control-label"></label>
         <div class="col-md-10">
@@ -232,7 +246,7 @@
     <div class="form-group">
         <label asp-for="ExpirationDate" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <input asp-for="ExpirationDate" class="form-control" data-date-format="mm/dd/yyyy" />
+            <input asp-for="ExpirationDate" class="form-control" />
             <span asp-validation-for="ExpirationDate" class="text-danger"></span>
         </div>
     </div>
@@ -256,58 +270,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    $(document).ready(function () {
-        $('[data-val-required]').parent().parent().children('label').append('<span style="color:red">*</span>');
-        //$('#ExpirationDate').datepicker({dateFormat: 'dd.MM.yyyy'});
-        $('button.absent').on("click",
-            function () {
-                var id = $(this).attr("data-for");
-                var input = $("#" + id).get(0);
-                input.value = "";
-                input.disabled = !input.disabled;
-                input.placeholder = input.disabled ? "ОТСУТСТВУЕТ" : "";
-            });
-        $('[data-toggle="tooltip"]').tooltip();
-        $("#mainForm").on('submit',
-            function () {
-                $("#mainForm input[type='text']").each(function () {
-                    this.value = this.value.toUpperCase();
-                });
-            });
-        getVin();
-        $("#VIN").on("blur", getVin);
-    });
-
-    function getVin() {
-        $("#lastRunning").html('<i class="fa fa-spinner" aria-hidden="true"></i>');
-        var vin = $("#VIN").val();
-        if (!vin) {
-            $("#lastRunning").text("введите VIN");
-            return;
-        }
-
-        $.getJSON("/cards/lastrunning/" + vin)
-            .done(function(result) {
-                console.log(result);
-                if (result.error === "session expired") {
-                    return;
-                }
-                if (result.error === "no info") {
-                    $("#lastRunning").text("нет информации");
-                    return;
-                }
-
-                if (result.error === "unknown error") {
-                    $("#lastRunning").text("не удалось получить информацию");
-                    return;
-                }
-
-                $("#lastRunning").text(`${result.running} км (${result.date.split('T')[0]})`);
-            })
-            .fail(function() {
-                $("#lastRunning").text("не удалось получить информацию");
-            });
-    }
-</script>

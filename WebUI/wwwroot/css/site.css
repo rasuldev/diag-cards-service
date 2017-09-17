@@ -71,3 +71,7 @@ td.actions a.btn {
 .input-group .tooltip.right {
     margin-left: 39px;
 }
+
+.form-horizontal h3 {
+    margin-top: 30px;
+}

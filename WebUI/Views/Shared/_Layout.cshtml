@@ -8,7 +8,7 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
           asp-fallback-href="~/css/font-awesome-4.7.0/css/font-awesome.min.css"/>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js" asp-fallback-src="lib/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/lib/jquery-datepicker/jquery-ui.min.css"/>
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
@@ -54,8 +54,8 @@
     @RenderBody()
     <hr/>
     <footer>
-        <p>&copy; 2017 - <a href="https://www.intellect.studio">Интеллектуальные системы</a>
-        </p>
+        @*<p>&copy; 2017 - <a href="https://www.intellect.studio">Интеллектуальные системы</a>
+        </p>*@
     </footer>
 </div>
 
@@ -79,6 +79,17 @@
     </script>
     <script src="~/js/site.min.js" asp-append-version="true"></script>
 </environment>
+    
+<script src="~/lib/jquery-datepicker/jquery-ui.min.js"></script>
+<script src="~/lib/jquery-datepicker/datepicker-ru.js"></script>
+<script type="text/javascript">
+    $.datepicker.setDefaults({
+        "dateFormat": "dd.mm.yy",
+        changeYear: true,
+        changeMonth: true
+    });
+    $.datepicker.setDefaults($.datepicker.regional["ru"]);
+</script>
 
 @RenderSection("Scripts", required: false)
     

@@ -18,8 +18,8 @@
         <input asp-for="Filter.Regnumber" placeholder="Регистрационный знак" class="form-control" style="width: 200px" />
         <input asp-for="Filter.Vin" placeholder="VIN" class="form-control" />
         <input asp-for="Filter.Fullname" placeholder="ФИО" class="form-control" />
-        <input asp-for="Filter.StartDate" placeholder="Дата создания: от" class="form-control" />
-        <input asp-for="Filter.EndDate" placeholder="Дата создания: до" class="form-control" />
+        <input asp-for="Filter.StartDate" value="@Model.Filter.StartDate?.ToString("dd.MM.yyyy")" placeholder="Дата создания: от" class="form-control" />
+        <input asp-for="Filter.EndDate" value="@Model.Filter.EndDate?.ToString("dd.MM.yyyy")" placeholder="Дата создания: до" class="form-control" />
 
         @Html.DropDownListFor(m => m.Filter.Status, (SelectList)ViewData["CardStatusEnum"], new { @class = "form-control" })
 
@@ -140,13 +140,23 @@
 </table>
 @Html.PagerLinks(totalCount: Model.TotalCardsCount, pageSize: 10, visiblePagesCount: 10)
 
+@section Scripts {
 <script type="text/javascript">
-    $("a.btn-register").on("click", function (e) {
-        e.preventDefault();
-        $("#reg_form_card_id").val($(this).attr("data-id"));
-        $("#register_form").submit();
-    })
+    $("a.btn-register").on("click",
+        function(e) {
+            e.preventDefault();
+            $("#reg_form_card_id").val($(this).attr("data-id"));
+            $("#register_form").submit();
+        });
+    $('#Filter_StartDate').datepicker({
+        //"altFormat": "yy-mm-dd",
+        //"altField": "#Filter_StartDate",
+    });
+    $('#Filter_EndDate').datepicker({
+        //"altFormat": "yy-mm-dd",
+        //"altField": "#Filter_StartDate",
+    });
 </script>
-
+}
 
 

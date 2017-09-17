@@ -6,13 +6,13 @@
 }
 
 <h2>Редактирование диагностической карты</h2>
-<hr/>
+<hr />
 
 @Html.ShowError(TempData["ErrorText"])
 @Html.ShowInfo(TempData["MessageText"])
 
 <form id="mainForm" asp-action="Edit" class="input-uppercase">
-    <input type="hidden" asp-for="UserId"/>
+    <input type="hidden" asp-for="UserId" />
     @{await Html.RenderPartialAsync("_CreateOrEdit", Model);}
 </form>
 
@@ -22,4 +22,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript" src="js/createoredit.js"></script>
 }
