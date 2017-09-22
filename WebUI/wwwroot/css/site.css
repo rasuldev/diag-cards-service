@@ -75,3 +75,19 @@ td.actions a.btn {
 .form-horizontal h3 {
     margin-top: 30px;
 }
+
+div.messages {
+    margin: 5px 0;
+}
+
+div.messages .alert {
+    margin-bottom: 5px;       
+}
+
+.dl-horizontal.card-info dd {
+    margin: 3px 0 3px 320px;
+}
+
+.dl-horizontal.card-info dt {
+    width: 300px;
+}

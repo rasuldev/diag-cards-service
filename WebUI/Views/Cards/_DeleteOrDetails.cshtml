@@ -1,0 +1,174 @@
+@model WebUI.Data.Entities.DiagnosticCard
+<div>
+    <hr />
+    <dl class="dl-horizontal card-info">
+        <dt>
+            @Html.DisplayNameFor(model => model.CardId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CardId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Lastname)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Lastname)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Firstname)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Firstname)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Patronymic)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Patronymic)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.VIN)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.VIN)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IssueYear)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IssueYear)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Manufacturer)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Manufacturer)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Model)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Model)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BodyNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BodyNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FrameNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FrameNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Running)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Running)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.RegNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.RegNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Weight)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Weight)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Category)
+        </dt>
+        <dd>
+            @Model.Category.Label()
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CategoryCommon)
+        </dt>
+        <dd>
+            @Model.CategoryCommon.Label()
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TyreManufacturer)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TyreManufacturer)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AllowedMaxWeight)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AllowedMaxWeight)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FuelType)
+        </dt>
+        <dd>
+            @Model.FuelType.Label()
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BrakeType)
+        </dt>
+        <dd>
+            @Model.BrakeType.Label()
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DocumentType)
+        </dt>
+        <dd>
+            @Model.DocumentType.Label()
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsForeigner)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsForeigner)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DocumentSeries)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DocumentSeries)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DocumentNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DocumentNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DocumentIssueDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DocumentIssueDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DocumentIssuer)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DocumentIssuer)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Note)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Note)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ExpirationDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ExpirationDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.User)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.User.UserName)
+        </dd>
+    </dl>
+</div>

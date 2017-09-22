@@ -30,7 +30,6 @@ namespace WebUI.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
-        private readonly string _externalCookieScheme;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
 
@@ -38,7 +37,6 @@ namespace WebUI.Controllers
         public AccountController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            IOptions<IdentityCookieOptions> identityCookieOptions,
             IEmailSender emailSender,
             ISmsSender smsSender,
             ILoggerFactory loggerFactory,
@@ -47,7 +45,6 @@ namespace WebUI.Controllers
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();

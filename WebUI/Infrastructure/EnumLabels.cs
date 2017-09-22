@@ -48,7 +48,7 @@ namespace WebUI.Infrastructure
         private static readonly Dictionary<VehicleCategory, string> VehicleCategoryLabels =
             new Dictionary<VehicleCategory, string>()
             {
-                [VehicleCategory.B] = "Б легковые"
+                [VehicleCategory.B] = "B легковые"
             };
 
         private static readonly Dictionary<VehicleCategoryCommon,string> VehicleCategoryCommonLabels = new Dictionary<VehicleCategoryCommon, string>()

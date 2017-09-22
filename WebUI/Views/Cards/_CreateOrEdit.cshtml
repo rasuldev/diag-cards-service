@@ -239,7 +239,7 @@
     <div class="form-group">
         <label asp-for="Note" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-            <input asp-for="Note" class="form-control" />
+            <textarea asp-for="Note" class="form-control" maxlength="250"></textarea>
             <span asp-validation-for="Note" class="text-danger"></span>
         </div>
     </div>
@@ -252,7 +252,7 @@
     </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <button type="submit" class="btn btn-success">@ViewData["ActionName"]</button>
+            <button type="submit" class="btn btn-success">@ViewData["ActionNameDraft"]</button>
         </div>
     </div>
     <div class="form-group">
@@ -266,7 +266,7 @@
                     title = "title='Лимит регистраций на сегодня исчерпан!'";
                 }
             }
-            <button @disabled @Html.Raw(title) type="submit" name="register" value="true" class="btn btn-success">@ViewData["ActionName"] и отправить в ЕАИСТО</button>
+            <button @disabled @Html.Raw(title) type="submit" name="register" value="true" class="btn btn-success">@ViewData["ActionNameReg"]</button>
         </div>
     </div>
 </div>

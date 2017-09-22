@@ -7,6 +7,7 @@ namespace EaisApi.Models
     public class DiagnosticCard
     {
         [MaxLength(30)]
+        [Display(Name = "Регистрационный номер")]
         public string CardId { get; set; }
         [Required(ErrorMessage = "Required"), Display(Name = "Фамилия"), MaxLength(30)]
         public string Lastname { get; set; }
@@ -88,16 +89,18 @@ namespace EaisApi.Models
         public string DocumentNumber { get; set; }
         [DataType(DataType.Text)]
         [Required(ErrorMessage = "Required"), Display(Name = "Дата выдачи")]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}")]
         public DateTime DocumentIssueDate { get; set; }
         [Required(ErrorMessage = "Required"), Display(Name = "Выдан кем"), MaxLength(50)]
         public string DocumentIssuer { get; set; }
 
-        [Display(Name = "Примечание"), MaxLength(250)]
+        [Display(Name = "Примечания"), MaxLength(250)]
         public string Note { get; set; }
 
         [Required(ErrorMessage = "Required")]
         [DataType(DataType.Text)]
         [Display(Name = "Срок действия карты")]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}")]
         public DateTime ExpirationDate { get; set; }
     }
 }

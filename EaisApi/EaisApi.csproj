@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="csquery.netstandard" Version="1.3.6.1" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>

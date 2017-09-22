@@ -2,15 +2,11 @@
 @{
     ViewData["Title"] = "Список карт";
 }
-<meta charset="utf-8">
 <h2>@ViewData["Title"]</h2>
 
 @*<p>
     <a asp-action="Create">Добавить новую карту</a>
 </p>*@
-
-@Html.ShowError(TempData["ErrorText"])    
-@Html.ShowInfo(TempData["MessageText"])
 
 @using (Html.BeginForm(FormMethod.Get))
 {
@@ -112,9 +108,9 @@
                     </td>
                 }
                 <td class="col-md-1 container actions">
-                    @*<a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Детали">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Детали">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    </a>*@
+                    </a>
                     <a asp-action="Create" asp-route-id="@item.Id" class="btn btn-primary" title="Создать новую на основе этой">
                         <i class="fa fa-copy" aria-hidden="true"></i>
                     </a>

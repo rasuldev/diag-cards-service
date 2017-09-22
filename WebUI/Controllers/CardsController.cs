@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using EaisApi.Models;
@@ -56,6 +57,8 @@ namespace WebUI.Controllers
         // GET: Cards
         public async Task<IActionResult> Index(ListCardsViewModel model)
         {
+            //this.AddErrorMessage("Изменения сохранены");
+            //this.AddInfoMessage("Изменения сохранены 4");
             var page = _pager.CurrentPage;
             var UserId = _userManager.GetUserId(User);
             isAdmin = User.IsInRole(UserRoles.Admin);
@@ -246,7 +249,7 @@ namespace WebUI.Controllers
 
         private async Task<IActionResult> Logout()
         {
-            TempData["ErrorText"] = "На ЕАИСТО истекла ваша сессия. Войдите еще раз для возобновления сессии.";
+            this.AddErrorMessage("На ЕАИСТО истекла ваша сессия. Войдите еще раз для возобновления сессии.");
             await _signInManager.SignOutAsync();
             var returnUrl = Request.GetUri().PathAndQuery;
             return RedirectToAction("Login", "Account", new {returnUrl});
@@ -421,6 +424,19 @@ namespace WebUI.Controllers
             {
                 return "{ \"error\": \"unknown error\" }";
             }
+        }
+
+        [HttpGet("cards/docx/{diagnosticCardId}")]
+        public async Task<IActionResult> GenerateDocx(int diagnosticCardId, [FromServices] CardDocxGenerator generator)
+        {
+            var card = await _context.DiagnosticCards.FindAsync(diagnosticCardId);
+            if (card == null)
+                return NotFound();
+            var stream = await generator.Generate(card);
+            return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
+                $"DiagCard-{card.Lastname}.docx");
+            //return File(stream, "application/octet-stream",
+            //    $"DiagCard-{card.Lastname}.docx");
         }
 
         [HttpGet("cards/touch")]

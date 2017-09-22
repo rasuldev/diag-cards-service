@@ -9,6 +9,7 @@ namespace WebUI.Data.Entities
         public int Id { get; set; }
         public string UserId { get; set; }
         [ForeignKey("UserId")]
+        [Display(Name = "Пользователь")]
         public User User { get; set; }
         [Display(Name = "Дата создания")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;

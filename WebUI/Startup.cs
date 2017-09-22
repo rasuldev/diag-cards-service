@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using EaisApi;
+using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -45,10 +47,12 @@ namespace WebUI
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
+            Environment = env;
             env.ConfigureNLog("nlog.config");
         }
 
-        public IConfigurationRoot Configuration { get; }
+        private IConfigurationRoot Configuration { get; }
+        private IHostingEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -59,7 +63,7 @@ namespace WebUI
 
             services.AddIdentity<User, IdentityRole>(options =>
             {
-                options.Cookies.ApplicationCookie.AutomaticChallenge = true;
+                //options.Cookies.ApplicationCookie.AutomaticChallenge = true;
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
@@ -69,10 +73,20 @@ namespace WebUI
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
+            services.AddAuthentication().AddFacebook(options =>
+            {
+                options.AppId = Configuration["Authentication:Facebook:AppId"];
+                options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+            });
+
             services.AddPager();
 
             services.AddLocalization(options => options.ResourcesPath = "Resources");
-            services.AddMvc(options => options.ModelBinderProviders.Insert(0, new DateModelBinderProvider()))
+            services.AddMvc(options =>
+                {
+                    options.Filters.Add<ExceptionFilter>();
+                    options.ModelBinderProviders.Insert(0, new DateModelBinderProvider());
+                })
                 .AddDataAnnotationsLocalization(
                     options => options.DataAnnotationLocalizerProvider = (type, factory) => factory.Create(typeof(SharedResource)));
 
@@ -81,6 +95,7 @@ namespace WebUI
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
+            services.AddSingleton(new CardDocxGenerator(Path.Combine(Environment.ContentRootPath, Configuration["CardTemplatePath"])));
 
             // Configuring session
             // Adds a default in-memory implementation of IDistributedCache.
@@ -89,7 +104,7 @@ namespace WebUI
             {
                 // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromMinutes(20);
-                options.CookieHttpOnly = true;
+                options.Cookie.HttpOnly = true;
             });
 
 
@@ -138,14 +153,10 @@ namespace WebUI
 
             app.UseStaticFiles();
 
-            app.UseIdentity();
+            app.UseAuthentication();
 
             // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
-            app.UseFacebookAuthentication(new FacebookOptions()
-            {
-                AppId = Configuration["Authentication:Facebook:AppId"],
-                AppSecret = Configuration["Authentication:Facebook:AppSecret"]
-            });
+            
 
             if (Configuration["AutoMigrate"].ToLower() == "true" && !env.IsEnvironment("TEST"))
             {

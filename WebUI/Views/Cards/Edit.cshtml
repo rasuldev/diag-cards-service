@@ -2,14 +2,12 @@
 
 @{
     ViewData["Title"] = "Редактирование";
-    ViewData["ActionName"] = "Сохранить";
+    ViewData["ActionNameDraft"] = "Сохранить изменения";
+    ViewData["ActionNameReg"] = "Сохранить и отправить в ЕАИСТО";
 }
 
 <h2>Редактирование диагностической карты</h2>
 <hr />
-
-@Html.ShowError(TempData["ErrorText"])
-@Html.ShowInfo(TempData["MessageText"])
 
 <form id="mainForm" asp-action="Edit" class="input-uppercase">
     <input type="hidden" asp-for="UserId" />
