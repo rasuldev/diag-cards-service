@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using EaisApi;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebUI.Infrastructure.Pagination;
+using WebUI.Models;
 
 namespace WebUI.Controllers
 {
     public class HomeController : Controller
     {
-        private EaistoApi _api;
+    	private readonly EaistoApi _api;
         private readonly Pager _pager;
 
         public HomeController(EaistoApi api, Pager pager)
@@ -21,33 +19,16 @@ namespace WebUI.Controllers
             _pager = pager;
         }
 
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
-
         public async Task<Stream> Init()
         {
             return await _api.InitRemoteSession();
         }
 
-        //public IActionResult About()
-        //{
-        //    var page = _pager.CurrentPage;
-        //    ViewData["Message"] = $"Page {page}.";
-        //    return View();
-        //}
-
-        //public IActionResult Contact()
-        //{
-        //    ViewData["Message"] = "Your contact page.";
-
-        //    return View();
-        //}
+	
 
         public IActionResult Error()
         {
-            return View();
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
