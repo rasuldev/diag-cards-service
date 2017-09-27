@@ -1,0 +1,11 @@
+﻿@model int
+
+@{
+    ViewBag.Title = "Настройки";
+}
+
+<h2>Задайте суточный лимит:</h2>
+<form class="form-horizontal" method="post">
+    <input name="limit" value="@Model" />
+    <button type="submit" class="btn btn-success">Сохранить</button>
+</form>

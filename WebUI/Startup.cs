@@ -80,7 +80,7 @@ namespace WebUI
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddSingleton(new CardDocxGenerator(Path.Combine(Environment.ContentRootPath, Configuration["CardTemplatePath"])));
-
+            services.AddSingleton(new Settings(Path.Combine(Environment.ContentRootPath, "daylimit.txt")));
             // Configuring session
             // Adds a default in-memory implementation of IDistributedCache.
             services.AddDistributedMemoryCache();

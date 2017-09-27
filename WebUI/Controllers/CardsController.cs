@@ -41,9 +41,9 @@ namespace WebUI.Controllers
         readonly IConfiguration _conf;
         private readonly ILogger<CardsController> _logger;
         private readonly SignInManager<User> _signInManager;
+        private Settings _settings;
 
-
-        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf, ILogger<CardsController> logger, SignInManager<User> signInManager)
+        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf, ILogger<CardsController> logger, SignInManager<User> signInManager, Settings settings)
         {
             _context = context;
             _userManager = userManager;
@@ -52,6 +52,7 @@ namespace WebUI.Controllers
             _conf = conf;
             _logger = logger;
             _signInManager = signInManager;
+            _settings = settings;
         }
 
         // GET: Cards
@@ -62,7 +63,6 @@ namespace WebUI.Controllers
             var page = _pager.CurrentPage;
             var UserId = _userManager.GetUserId(User);
             isAdmin = User.IsInRole(UserRoles.Admin);
-            ViewData["isDayLimitExhausted"] = IsDayLimitExceeded();
 
             if (model.Filter.Status == null)
                 model.Filter.Status = CardStatusEnum.All;
@@ -466,11 +466,29 @@ namespace WebUI.Controllers
             return "";
         }
 
+        [HttpGet("cards/setup")]
+        public IActionResult SetupDayLimit()
+        {
+            return View(_settings.GetDayLimit());
+        }
+
+        [HttpPost("cards/setup")]
+        public IActionResult SetupDayLimit(int limit)
+        {
+            if (_settings.SetDayLimit(limit))
+                this.AddInfoMessage($"Дневной лимит изменен на {limit}");
+            else
+            {
+                this.AddErrorMessage("Не удалось изменить дневной лимит. Попробуйте еще раз");
+            }
+            return RedirectToAction("SetupDayLimit");
+        }
+
         private bool IsDayLimitExceeded()
         {
-            int limit = _conf.GetValue<int>("DayLimit");
-            DateTime DateTimeNow = DateTime.Now;
-            DateTime curDate = new DateTime(DateTimeNow.Year, DateTimeNow.Month, DateTimeNow.Day);
+            int limit = _settings.GetDayLimit(); //_conf.GetValue<int>("DayLimit");
+            DateTime dateTimeNow = DateTime.Now;
+            DateTime curDate = new DateTime(dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day);
 
             var registeredCardsList = _context.DiagnosticCards.Where(s => s.RegisteredDate != null)
                 .Where(item => item.RegisteredDate.Value.DayOfYear.Equals(curDate.DayOfYear)).ToList();
