@@ -36,7 +36,7 @@ namespace WebUI.Infrastructure
                 }
 
                 ReplaceSeq(1, 15, card.CardId);
-                ReplaceSeq(20, 27, card.ExpirationDate.ToString("ddMMyyyy"));
+                ReplaceSeq(20, 27, card.ExpirationDate?.ToString("ddMMyyyy"));
                 ReplaceSeq(30, 37, card.RegisteredDate?.ToString("ddMMyyyy"));
                 Replace("#reg_znak#", card.RegNumber);
                 Replace("#vin#", card.VIN);

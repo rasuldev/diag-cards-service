@@ -34,6 +34,7 @@ function getVin() {
     $.getJSON("/cards/lastrunning/" + vin)
         .done(function (result) {
             console.log(result);
+            result = $.parseJSON(result);
             if (result.error === "session expired") {
                 $("#lastRunning").text("не удалось получить информацию");
                 return;
@@ -52,5 +53,8 @@ function getVin() {
         })
         .fail(function () {
             $("#lastRunning").text("не удалось получить информацию");
+        }).error(function(e) {
+            console.log(e);
         });
+    
 }

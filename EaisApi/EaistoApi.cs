@@ -416,7 +416,7 @@ namespace EaisApi
             Add("SVID_O_REG", info.DocumentType == DocumentTypes.RegistrationCertificate ? "0" : "1");
             Add("SVID_O_REG_SERIA", info.DocumentSeries);
             Add("SVID_O_REG_NOMER", info.DocumentNumber);
-            Add("SVID_O_REG_KOGDA", info.DocumentIssueDate.ToString("dd.MM.yyyy"));
+            Add("SVID_O_REG_KOGDA", info.DocumentIssueDate?.ToString("dd.MM.yyyy"));
             Add("SVID_O_REG_KEM", info.DocumentIssuer);
             if (info.IsForeigner)
                 Add("SVID_FOREIGN", "1");
@@ -440,7 +440,7 @@ namespace EaisApi
 
             Add("RESULTAT_PRIMECHANIE", info.Note);
             Add("ZAKLUCHENIE", "1");
-            Add("SROK_DEISTV", info.ExpirationDate.ToString("dd.MM.yyyy"));
+            Add("SROK_DEISTV", info.ExpirationDate?.ToString("dd.MM.yyyy"));
             Add("OSOB_OTMETKI", "");
             Add("PERVICH_PROVERKA", "1");
         }

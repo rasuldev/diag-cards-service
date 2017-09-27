@@ -21,7 +21,7 @@ namespace EaisApi.Models
         [Required(ErrorMessage = "Required"), Display(Name = "Год выпуска ТС")]
         [RegularExpression("\\d{4,4}", ErrorMessage = "Должно быть ровно 4 цифры")]
         [DataType(DataType.Text)]
-        public int IssueYear { get; set; }
+        public int? IssueYear { get; set; }
 
         /// <summary>
         /// Марка ТС
@@ -44,7 +44,7 @@ namespace EaisApi.Models
         [Range(100, int.MaxValue, ErrorMessage = "Должно быть указано целое число, не меньшее {1}")]
         [RegularExpression("\\d+", ErrorMessage = "Должно быть указано целое число")]
         [DataType(DataType.Text)]
-        public int Running { get; set; }
+        public int? Running { get; set; }
         /// <summary>
         /// Государственный регистрационный знак
         /// </summary>
@@ -54,13 +54,13 @@ namespace EaisApi.Models
         /// Масса без нагрузки (кг)
         /// </summary>
         [Required(ErrorMessage = "Required"), Display(Name = "Масса без нагрузки (кг)")]
-        public int Weight { get; set; }
+        public int? Weight { get; set; }
 
         [Required(ErrorMessage = "Required"), Display(Name = "Категория ТС (СРТС или ПТС)")]
-        public VehicleCategory Category { get; set; }
+        public VehicleCategory? Category { get; set; }
 
         [Required(ErrorMessage = "Required"), Display(Name = "Категория ТС (ОКП)")]
-        public VehicleCategoryCommon CategoryCommon { get; set; }
+        public VehicleCategoryCommon? CategoryCommon { get; set; }
 
         [Required(ErrorMessage = "Required"), Display(Name = "Марка шин"), MaxLength(30)]
         public string TyreManufacturer { get; set; }
@@ -69,16 +69,16 @@ namespace EaisApi.Models
         /// Разрешенная максимальная масса (кг)
         /// </summary>
         [Required(ErrorMessage = "Required"), Display(Name = "Разрешенная максимальная масса (кг)")]
-        public int AllowedMaxWeight { get; set; }
+        public int? AllowedMaxWeight { get; set; }
 
         [Required(ErrorMessage = "Required"), Display(Name = "Тип топлива")]
-        public FuelTypes FuelType { get; set; }
+        public FuelTypes? FuelType { get; set; }
 
         [Required(ErrorMessage = "Required"), Display(Name = "Тип привода тормозной системы")]
-        public BrakeTypes BrakeType { get; set; }
+        public BrakeTypes? BrakeType { get; set; }
 
         [Required(ErrorMessage = "Required"), Display(Name = "Регистрационный документ")]
-        public DocumentTypes DocumentType { get; set; }
+        public DocumentTypes? DocumentType { get; set; }
 
         [Display(Name = "Собственник - иностранный гражданин")]
         public bool IsForeigner { get; set; }
@@ -89,8 +89,8 @@ namespace EaisApi.Models
         public string DocumentNumber { get; set; }
         [DataType(DataType.Text)]
         [Required(ErrorMessage = "Required"), Display(Name = "Дата выдачи")]
-        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}")]
-        public DateTime DocumentIssueDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime? DocumentIssueDate { get; set; }
         [Required(ErrorMessage = "Required"), Display(Name = "Выдан кем"), MaxLength(50)]
         public string DocumentIssuer { get; set; }
 
@@ -100,7 +100,7 @@ namespace EaisApi.Models
         [Required(ErrorMessage = "Required")]
         [DataType(DataType.Text)]
         [Display(Name = "Срок действия карты")]
-        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}")]
-        public DateTime ExpirationDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime? ExpirationDate { get; set; }
     }
 }

@@ -491,7 +491,7 @@ namespace WebUI.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(CardsController.Index), "Cards");
+                return RedirectToAction(nameof(CardsController.Create), "Cards");
             }
         }
 
