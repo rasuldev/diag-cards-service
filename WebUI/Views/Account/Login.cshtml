@@ -12,23 +12,24 @@
 <h2>Вход</h2>
 
 <div class="row">
-    <div class="col-md-6">
-        <section>
+    <div class="col-md-12">
+        <h4>Введите логин и пароль.</h4>
+        <hr />
+        <section class="col-md-6">
             <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
-                <h4>Введите логин и пароль.</h4>
-                <hr />
+
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="Email" class="col-md-3 control-label"></label>
                     <div class="col-md-9">
-                        <input asp-for="Email" autofocus class="form-control" />
+                        <input asp-for="Email" autofocus class="form-control"/>
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label asp-for="Password" class="col-md-3 control-label"></label>
                     <div class="col-md-9">
-                        <input asp-for="Password" class="form-control" />
+                        <input asp-for="Password" class="form-control"/>
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
                 </div>
@@ -36,7 +37,7 @@
                     <label asp-for="CaptchaText" class="col-md-3 control-label"></label>
                     <div class="col-md-9">
                         <input asp-for="CaptchaText" type="text" class="form-control" style="display: inline; width: 135px"/>
-                        <img src="@Url.Action("Init", "Home")" alt="Captcha" />
+                        <img src="@Url.Action("Init", "Home")" alt="Captcha"/>
                     </div>
                 </div>
 
@@ -54,7 +55,7 @@
             </form>
         </section>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6" style="display: none">
         <section>
             <h4>Войти через соцсети.</h4>
             <hr />
