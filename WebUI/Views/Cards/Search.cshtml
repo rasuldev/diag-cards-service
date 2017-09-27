@@ -1,18 +1,82 @@
 ﻿@using WebUI.Models.CardsViewModels
-@model WebUI.Models.CardsViewModels.SearchFilterModel
+@model WebUI.Models.CardsViewModels.SearchEaistoModel
 @{
     ViewData["Title"] = "Search";
 }
 
 <h2>Search</h2>
 
-
 <form asp-action="Search" class="form-inline" method="get">
-    <input class="form-control" placeholder="VIN" asp-for="Vin" type="text" />
-    <input class="form-control" placeholder="Регистрационный знак" asp-for="RegNumber" type="text" />
-    <input class="form-control" placeholder="Серия талона ТО" asp-for="TicketSeries" type="text" />
-    <input class="form-control" placeholder="Номер талона ТО" asp-for="TicketNumber" type="text" />
-    <input class="form-control" placeholder="Номер кузова" asp-for="BodyNumber" type="text" />
-    <input class="form-control" placeholder="Номер шасси" asp-for="FrameNumber" type="text" />
+    <input class="form-control" placeholder="VIN" asp-for="Filter.Vin" type="text" />
+    <input class="form-control" placeholder="Регистрационный знак" asp-for="Filter.RegNumber" type="text" />
+    <input class="form-control" placeholder="Серия талона ТО" asp-for="Filter.TicketSeries" type="text" />
+    <input class="form-control" placeholder="Номер талона ТО" asp-for="Filter.TicketNumber" type="text" />
+    <input class="form-control" placeholder="Номер кузова" asp-for="Filter.BodyNumber" type="text" />
+    <input class="form-control" placeholder="Номер шасси" asp-for="Filter.FrameNumber" type="text" />
     <input type="submit" value="Поиск" class="btn btn-warning" />
 </form>
+@if (Model.Results == null)
+{
+    return;
+}
+@if (Model.Results.Any())
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Серия/Номер бланка</th>
+            <th>Тип</th>
+            <th>Дата выдачи</th>
+            <th>VIN</th>
+            <th>Кузов №</th>
+            <th>Шасси (Рама) №</th>
+            <th>Регистр. номер (Бортовой номер)</th>
+            <th>Действует до</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var result in Model.Results)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(m => result.BlankNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => result.DocumentType)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => result.IssueDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => result.Vin)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => result.BodyNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => result.FrameNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => result.RegNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => result.ExpirationDate)
+                </td>
+                <td class="col-md-1 container actions">
+                    @{
+                        var url = $"/cards/createfromfind?vin={result.Vin}&bodyNumber={result.BodyNumber}&frameNumber={result.FrameNumber}&regNumber={result.RegNumber}";
+                    } 
+                    <a href="@url" class="btn btn-primary" title="Создать карту на основе этой информации">
+                        <i class="fa fa-copy" aria-hidden="true"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3>Карт не найдено.</h3>
+}
+

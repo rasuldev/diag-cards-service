@@ -190,9 +190,9 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards/Create
-        public async Task<IActionResult> Create(int? Id)
+        public async Task<IActionResult> Create(int? id)
         {
-            if (Id == null)
+            if (id == null)
             {
                 CreateOrEditInit();
                 return View();
@@ -200,9 +200,23 @@ namespace WebUI.Controllers
 
             var diagnosticCard = _context.DiagnosticCards
                 .Include(d => d.User)
-                .SingleOrDefault(m => m.Id == Id);
+                .SingleOrDefault(m => m.Id == id);
             CreateOrEditInit(diagnosticCard);
             return View(diagnosticCard);
+        }
+
+        [HttpGet("cards/createfromfind")]
+        public async Task<IActionResult> CreateFromFind(string vin, string bodyNumber, string frameNumber, string regNumber)
+        {
+            var card = new DiagnosticCard
+            {
+                VIN = vin,
+                BodyNumber = bodyNumber,
+                FrameNumber = frameNumber,
+                RegNumber = regNumber
+            };
+            CreateOrEditInit();
+            return View("Create", card);
         }
 
         // POST: Cards/Create
@@ -364,7 +378,7 @@ namespace WebUI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Search(SearchFilterModel filter)
+        public async Task<IActionResult> Search(SearchEaistoModel model)
         {
             //vin = PrepareParameter(vin);
             //regNumber = PrepareParameter(regNumber);
@@ -374,8 +388,12 @@ namespace WebUI.Controllers
             //frameNumber = PrepareParameter(frameNumber);
 
             // Method is not working
-            string result = await _api.Search(filter.Vin, filter.RegNumber, filter.TicketSeries, filter.TicketNumber, filter.BodyNumber, filter.FrameNumber);
-            return View(filter);
+            if (model.Filter != null)
+            {
+               var results = await _api.Search(model.Filter.Vin, model.Filter.RegNumber, model.Filter.TicketSeries, model.Filter.TicketNumber, model.Filter.BodyNumber, model.Filter.FrameNumber);
+                model.Results = results;
+            }
+            return View(model);
         }
 
         public string PrepareParameter(string par)

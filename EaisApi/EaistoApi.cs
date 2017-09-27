@@ -186,7 +186,7 @@ namespace EaisApi
         /// <param name="bodyNumber">Номер кузова</param>
         /// <param name="frameNumber">Номер шасси (рамы)</param>
         /// <returns></returns>
-        public async Task<string> Search(string vin = null, string regNumber = null, string ticketSeries = null,
+        public async Task<List<SearchResult>> Search(string vin = null, string regNumber = null, string ticketSeries = null,
             string ticketNumber = null, string bodyNumber = null, string frameNumber = null)
         {
             string Escape(string s) => Uri.EscapeUriString(s ?? "");
@@ -200,7 +200,22 @@ namespace EaisApi
             {
                 throw new NotAuthorizedException();
             }
-            throw new NotImplementedException();
+            var html = await response.Content.ReadAsStringAsync();
+            var cq = CQ.Create(html);
+
+            var rows = cq[".white_tbl tr.td_white"];
+            var results = new List<SearchResult>();
+            foreach (var row in rows)
+            {
+                var columns = CQ.Create(row.InnerHTML)["td"].Skip(1).Take(8).ToList();
+                var search = new SearchResult();
+                for (int i = 0; i < 8; i++)
+                {
+                    search[i] = columns[i].InnerText;
+                }
+                results.Add(search);
+            }
+            return results;
         }
 
         //public async Task<string> Search(SearchParams search)

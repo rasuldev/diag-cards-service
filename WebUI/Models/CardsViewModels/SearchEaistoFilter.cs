@@ -1,6 +1,6 @@
 ﻿namespace WebUI.Models.CardsViewModels
 {
-    public class SearchFilterModel
+    public class SearchEaistoFilter
     {
         public string Vin { get; set; }
         public string RegNumber { get; set; }
