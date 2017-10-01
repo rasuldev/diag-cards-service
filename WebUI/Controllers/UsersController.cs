@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using WebUI.Data;
 using WebUI.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
+using WebUI.Infrastructure;
 using WebUI.Models;
 using WebUI.Infrastructure.Pagination;
 
@@ -33,39 +34,36 @@ namespace WebUI.Controllers
             if (filter == null)
                 filter = UserStatusEnum.All;
 
-            var statusList = GetUserStatusList(filter);
-            TempData["filter"] = filter;
-            TempData["UserStatusEnum"] = statusList;
-            TempData["UserStatusSelectedIndex"] = (int)filter;
-            var resultList = new List<User>();
+            //var statusList = GetUserStatusList(filter);
+            ViewData["UserStatusEnum"] = Misc.CreateSelectListFrom<UserStatusEnum>(filter);
+            IQueryable<User> resultList;
             switch (filter)
             {
                 case UserStatusEnum.Rejected:
-                    resultList = await _context.User
+                    resultList = _context.User
                         .Where(users => users.IsApproved.Equals(false))
-                        .Where(users => users.IsRemoved.Equals(false))
-                        .ToListAsync();
+                        .Where(users => users.IsRemoved.Equals(false));
                     break;
                 case UserStatusEnum.Accepted:
-                    resultList = await _context.User
+                    resultList = _context.User
                         .Where(users => users.IsApproved.Equals(true))
-                        .Where(users => users.IsRemoved.Equals(false))
-                        .ToListAsync();
+                        .Where(users => users.IsRemoved.Equals(false));
                     break;
                 case UserStatusEnum.Waiting:
-                    resultList = await _context.User.Where(users => users.IsRemoved.Equals(false)).Where(users => users.IsApproved == null).ToListAsync();
+                    resultList = _context.User
+                        .Where(users => users.IsRemoved.Equals(false))
+                        .Where(users => users.IsApproved == null);
                     break;
                 case UserStatusEnum.Deleted:
-                    resultList = await _context.User
-                        .Where(users => users.IsRemoved.Equals(true))
-                        .ToListAsync();
+                    resultList = _context.User
+                        .Where(users => users.IsRemoved.Equals(true));
                     break;
                 default:
-                    resultList = await _context.User.Where(user => user.IsRemoved == false).ToListAsync();
+                    resultList = _context.User.Where(user => user.IsRemoved == false);
                     break;
             }
-            ViewData["UsersCount"] = resultList.Count;
-            return View(resultList.Skip(10 * (page - 1)).Take(10));
+            ViewData["UsersCount"] = await resultList.CountAsync();
+            return View(await resultList.GetPage(page, 10).ToListAsync());
         }
 
         public SelectList GetUserStatusList(UserStatusEnum? selectedValue)

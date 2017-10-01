@@ -12,9 +12,9 @@ namespace WebUI.Infrastructure
         {
             [UserStatusEnum.All] = "Все",
             [UserStatusEnum.Waiting] = "Ожидающие подтверждения",
-            [UserStatusEnum.Accepted] = "Принятые",
-            [UserStatusEnum.Rejected] = "Отклоненные",
-            [UserStatusEnum.Deleted] = "Удаленные"
+            [UserStatusEnum.Accepted] = "Принят",
+            [UserStatusEnum.Rejected] = "Отклонен",
+            [UserStatusEnum.Deleted] = "Удален"
         };
 
         private static readonly Dictionary<CardStatusEnum, string> CardStatusLabels =

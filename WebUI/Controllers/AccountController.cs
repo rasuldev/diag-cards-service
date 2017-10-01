@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using WebUI.Data.Entities;
+using WebUI.Infrastructure;
 using WebUI.Models;
 using WebUI.Models.AccountViewModels;
 using WebUI.Services;
@@ -268,6 +269,7 @@ namespace WebUI.Controllers
                     //await _signInManager.SignInAsync(user, isPersistent: false);
                     await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, UserRoles.Local, ClaimValueTypes.String));
                     _logger.LogInformation("User created a new account with password.");
+                    this.AddInfoMessage("Вы успешно зарегистрировались.");
                     return RedirectToLocal(returnUrl);
                 }
                 AddErrors(result);
