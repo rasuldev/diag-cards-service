@@ -11,6 +11,7 @@
 
 <form id="mainForm" asp-action="Edit" class="input-uppercase">
     <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="CreatedDate" />
     @{await Html.RenderPartialAsync("_CreateOrEdit", Model);}
 </form>
 

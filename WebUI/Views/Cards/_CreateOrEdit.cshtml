@@ -237,10 +237,23 @@
     
 <h3>Заключительная информация</h3>
     <div class="form-group">
+        <label asp-for="CardType" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <select asp-for="CardType" asp-items="ViewBag.CardTypesList" class="form-control"></select>
+            <span asp-validation-for="CardType" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
         <label asp-for="Note" class="col-md-2 control-label"></label>
         <div class="col-md-10">
             <textarea asp-for="Note" class="form-control" maxlength="250"></textarea>
             <span asp-validation-for="Note" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="RegisteredDate" class="col-md-2 control-label">Дата регистрации</label>
+        <div class="col-md-10">
+            <input id="RegisteredDate" class="form-control" readonly="readonly" value="@DateTime.Now.ToString("dd.MM.yyyy")" />
         </div>
     </div>
     <div class="form-group">

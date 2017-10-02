@@ -7,6 +7,11 @@ namespace WebUI.Infrastructure
 {
     public class DateModelBinder : IModelBinder
     {
+        private readonly IModelBinder fallbackBinder;
+        public DateModelBinder(IModelBinder fallbackBinder)
+        {
+            this.fallbackBinder = fallbackBinder;
+        }
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
             var dateStr = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
@@ -17,8 +22,9 @@ namespace WebUI.Infrastructure
             {
                 bindingContext.ModelState.SetModelValue(bindingContext.ModelName, date, dateStr.FirstValue);
                 bindingContext.Result = ModelBindingResult.Success(date);
+                return Task.CompletedTask;
             }
-            return Task.CompletedTask;
+            return fallbackBinder.BindModelAsync(bindingContext);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace WebUI.Infrastructure
     public class DateModelBinderProvider : IModelBinderProvider
     {
         private readonly IModelBinder binder =
-            new DateModelBinder();
+            new DateModelBinder(new SimpleTypeModelBinder(typeof(DateTime)));
         //new SimpleTypeModelBinder(typeof(DateTime));
 
         public IModelBinder GetBinder(ModelBinderProviderContext context)

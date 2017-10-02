@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     $('#DocumentIssueDate').datepicker();
     $('#ExpirationDate').datepicker();
-
+    
     $('[data-val-required]').parent().parent().children('label').append('<span style="color:red">*</span>');
     //$('#ExpirationDate').datepicker({dateFormat: 'dd.MM.yyyy'});
     $('button.absent').on("click",
@@ -19,6 +19,13 @@
                 this.value = this.value.toUpperCase();
             });
         });
+
+    processExpDate();
+    $("#CardType").on("change", () => {
+        processExpDate();
+        processNotes(); 
+    });
+    $("#IssueYear").on("blur", processExpDate);
     getVin();
     $("#VIN").on("blur", getVin);
 });
@@ -57,4 +64,50 @@ function getVin() {
             console.log(e);
         });
     
+}
+
+function processNotes() {
+    var taxiNotes = "ИСПОЛЬЗУЕТСЯ В КАЧЕСТВЕ ТАКСИ";
+    var cardType = $("#CardType").val();
+    var note = $("#Note");
+    if (cardType === "11") {
+        // if Taxi
+        if (note.val().trim() === "") {
+            note.val(taxiNotes);
+        }
+    } else {
+        if (note.val() === taxiNotes) {
+            note.val("");
+        }
+    }
+}
+
+function processExpDate() {
+    // Current date
+    var regDate = strToDate($("#RegisteredDate").val());
+    var cardType = $("#CardType").val();
+    var monthsToAdd = 12;
+    if (cardType === "11") {
+        // if Taxi
+        monthsToAdd = 6;
+    } else {
+        var carAge = regDate.getYear() - $("#IssueYear").val();
+        monthsToAdd = (carAge > 7) ? 12 : 24;
+    }
+
+    regDate.setMonth(regDate.getMonth() + monthsToAdd);
+    regDate.setDate(regDate.getDate() - 1);
+    $("#ExpirationDate").val(dateToStr(regDate));
+}
+
+function strToDate(dateStr) {
+    var chunks = dateStr.split(".");
+    return new Date(chunks[2], chunks[1]-1, parseInt(chunks[0]));
+}
+
+function dateToStr(date) {
+    var day = date.getDate().toString().padStart(2, "0");
+    var month = (date.getMonth() + 1).toString().padStart(2, "0");
+    var year = date.getFullYear();
+    return `${day}.${month}.${year}`;
 }

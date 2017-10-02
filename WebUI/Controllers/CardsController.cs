@@ -224,7 +224,7 @@ namespace WebUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate")] DiagnosticCard diagnosticCard, bool register = false)
+        public async Task<IActionResult> Create([Bind("UserId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate,CardType")] DiagnosticCard diagnosticCard, bool register = false)
         {
             if (ModelState.IsValid)
             {
@@ -294,7 +294,7 @@ namespace WebUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,Id,CardId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate")] DiagnosticCard diagnosticCard, bool register = false)
+        public async Task<IActionResult> Edit(int id, [Bind("UserId,Id,CardId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate,CardType,CreatedDate")] DiagnosticCard diagnosticCard, bool register = false)
         {
             CreateOrEditInit();
             if (id != diagnosticCard.Id)
@@ -324,15 +324,13 @@ namespace WebUI.Controllers
                 try
                 {
                     await RegisterCard(diagnosticCard.Id);
-                    TempData["MessageText"] =
-                        $"Карта {diagnosticCard.Id} (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО";
+                    this.AddInfoMessage($"Карта {diagnosticCard.Id} (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО");
                     return RedirectToAction("Index");
                 }
                 catch (RegisterCardException e)
                 {
-                    TempData["ErrorText"] = e.Message;
-                    TempData["MessageText"] =
-                        "Изменения сохранены. Вы можете попытаться отправить карту на регистрацию еще раз несколько позже.";
+                    this.AddErrorMessage(e.Message);
+                    this.AddInfoMessage("Изменения сохранены. Вы можете попытаться отправить карту на регистрацию еще раз несколько позже.");
                     return RedirectToAction("Edit", new {id = diagnosticCard.Id});
                 }
                 catch (NotAuthorizedException)
@@ -500,7 +498,7 @@ namespace WebUI.Controllers
             return _context.DiagnosticCards.Any(e => e.Id == id);
         }
 
-        private void CreateOrEditInit(EaisApi.Models.DiagnosticCard diagnosticCard = null)
+        private void CreateOrEditInit(DiagnosticCard diagnosticCard = null)
         {
             if (IsDayLimitExceeded())
                 ViewData["LimitExceeded"] = true;
@@ -510,6 +508,7 @@ namespace WebUI.Controllers
             ViewData["FuelTypesList"] = Misc.CreateSelectListFrom<FuelTypes>(diagnosticCard?.FuelType, "");
             ViewData["BrakeTypesList"] = Misc.CreateSelectListFrom<BrakeTypes>(diagnosticCard?.BrakeType, "");
             ViewData["DocumentTypesList"] = Misc.CreateSelectListFrom<DocumentTypes>(diagnosticCard?.DocumentType, "");
+            ViewData["CardTypesList"] = Misc.CreateSelectListFrom<CardTypes>(diagnosticCard?.CardType);
             ViewData["ManufacturesOptions"] = "";
         }
 

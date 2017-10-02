@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebUI.Models;
 
 namespace WebUI.Data.Entities
 {
@@ -18,6 +19,9 @@ namespace WebUI.Data.Entities
         /// </summary>
         [Display(Name = "Дата регистрации")]
         public DateTime? RegisteredDate { get; set; }
+
+        [Display(Name = "Тип")]
+        public CardTypes CardType { get; set; }
 
         [NotMapped]
         [Display(Name = "ФИО")]

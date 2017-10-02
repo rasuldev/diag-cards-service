@@ -64,6 +64,16 @@ namespace WebUI.Infrastructure
                 [DocumentTypes.VehiclePassport] = "Паспорт транспортного средства"
             };
 
+        private static readonly Dictionary<CardTypes, string> CardTypeLabels =
+            new Dictionary<CardTypes, string>()
+            {
+                [CardTypes.Common] = "Обычное ТС",
+                //[CardTypes.DangerLoad] = "Опасный груз",
+                //[CardTypes.RouteTranport] = "Маршрутные перевозки",
+                [CardTypes.Taxi] = "Такси",
+                //[CardTypes.TrainingDrive] = "Учебная езда"
+            };
+
         public static string Label(this Enum e)
         {
             switch (e)
@@ -82,6 +92,8 @@ namespace WebUI.Infrastructure
                     return VehicleCategoryLabels[val];
                 case VehicleCategoryCommon val:
                     return VehicleCategoryCommonLabels[val];
+                case CardTypes val:
+                    return CardTypeLabels[val];
                 default:
                     return e.ToString();
             }
