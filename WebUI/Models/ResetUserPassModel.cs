@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebUI.Models.AccountViewModels
+namespace WebUI.Models
 {
-    public class RegisterViewModel
+    public class ResetUserPassModel
     {
         [Required]
-        [Display(Name = "Логин")]
-        public string Email { get; set; }
+        public string UserId { get; set; }
+
+        public string Username { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "Длина пароля должна быть от {2} до {1} символов.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Пароль")]
+        [Display(Name = "Введите новый пароль")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Повторите пароль")]
+        [Display(Name = "Подтвердите пароль")]
         [Compare("Password", ErrorMessage = "Пароли не совпадают.")]
         public string ConfirmPassword { get; set; }
     }

@@ -9,7 +9,7 @@ namespace WebUI.Models.AccountViewModels
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "Логин/Email")]
+        [Display(Name = "Логин")]
         //[EmailAddress]
         public string Email { get; set; }
 

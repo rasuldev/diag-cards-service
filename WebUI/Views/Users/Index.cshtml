@@ -72,6 +72,7 @@
                                 break;
                             case "success":// accepted user
                                 @*<a asp-action="Reject" asp-route-id="@item.Id" class="action-btn btn btn-warning">Отклонить</a>*@
+                                <a asp-action="ResetPassword" asp-route-id="@item.Id" class="action-btn btn btn-warning">Сброс пароля</a>
                                 <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn btn-danger">Удалить</a>
                                 break;
                             case "info":// waiting user

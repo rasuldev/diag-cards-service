@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using WebUI.Data;
 using WebUI.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using WebUI.Infrastructure;
 using WebUI.Models;
 using WebUI.Infrastructure.Pagination;
@@ -249,6 +250,30 @@ namespace WebUI.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string id)
+        {
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound("Пользователь не найден");
+            }
+            return View(new ResetUserPassModel() { UserId = user.Id, Username = user.UserName, Password = "123" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetUserPassModel userModel, [FromServices] UserManager<User> userManager)
+        {
+            var user = await _context.User.FindAsync(userModel.UserId);
+            if (user == null)
+            {
+                return NotFound("Пользователь не найден");
+            }
+            await userManager.RemovePasswordAsync(user);
+            await userManager.AddPasswordAsync(user, userModel.Password);
+            this.AddInfoMessage("Пароль успешно изменен!");
+            return RedirectToAction("Index");
+        }
 
         private bool UserExists(string id)
         {
