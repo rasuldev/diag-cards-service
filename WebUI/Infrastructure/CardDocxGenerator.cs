@@ -8,16 +8,19 @@ namespace WebUI.Infrastructure
     public class CardDocxGenerator
     {
         private readonly string _templateFile;
+        private readonly string _templateWithoutStamp;
 
-        public CardDocxGenerator(string templateFile)
+        public CardDocxGenerator(string templateFile, string templateWithoutStamp)
         {
             _templateFile = templateFile;
+            _templateWithoutStamp = templateWithoutStamp;
         }
 
-        public async Task<Stream> Generate(DiagnosticCard card)
+        public async Task<Stream> Generate(DiagnosticCard card, bool withStamp = true)
         {
+            var templateFile = withStamp ? _templateFile : _templateWithoutStamp;
             var memoryStream = new MemoryStream();
-            using (var fs = new FileStream(_templateFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var fs = new FileStream(templateFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 await fs.CopyToAsync(memoryStream);
             }

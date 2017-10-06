@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
     $('#DocumentIssueDate').datepicker();
-    $('#ExpirationDate').datepicker();
+    //$('#ExpirationDate').datepicker();
     
     $('[data-val-required]').parent().parent().children('label').append('<span style="color:red">*</span>');
     //$('#ExpirationDate').datepicker({dateFormat: 'dd.MM.yyyy'});
@@ -91,7 +91,7 @@ function processExpDate() {
         // if Taxi
         monthsToAdd = 6;
     } else {
-        var carAge = regDate.getYear() - $("#IssueYear").val();
+        var carAge = regDate.getFullYear() - $("#IssueYear").val();
         monthsToAdd = (carAge > 7) ? 12 : 24;
     }
 

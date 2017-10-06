@@ -7,7 +7,7 @@ namespace EaisApi.Models
     public class DiagnosticCard
     {
         [MaxLength(30)]
-        [Display(Name = "Регистрационный номер")]
+        [Display(Name = "Номер карты")]
         public string CardId { get; set; }
         [Required(ErrorMessage = "Required"), Display(Name = "Фамилия"), MaxLength(30)]
         public string Lastname { get; set; }

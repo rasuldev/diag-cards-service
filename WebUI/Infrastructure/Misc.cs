@@ -35,6 +35,16 @@ namespace WebUI.Infrastructure
                 }));
             return new SelectList(items, "Value", "Text", selectedValue?.GetValueAsString());
         }
+
+        public static string ToRussianDateFormat(this DateTime? date)
+        {
+            return date?.ToRussianDateFormat();
+        }
+
+        public static string ToRussianDateFormat(this DateTime date)
+        {
+            return date.ToString("dd.MM.yyyy");
+        }
     }
 
     //public struct SelectListItem

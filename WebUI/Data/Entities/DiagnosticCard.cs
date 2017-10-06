@@ -13,11 +13,13 @@ namespace WebUI.Data.Entities
         [Display(Name = "Пользователь")]
         public User User { get; set; }
         [Display(Name = "Дата создания")]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         /// <summary>
         /// Saved in Eaisto date
         /// </summary>
-        [Display(Name = "Дата регистрации")]
+        [Display(Name = "Дата выдачи карты")]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? RegisteredDate { get; set; }
 
         [Display(Name = "Тип")]

@@ -236,24 +236,30 @@ namespace WebUI.Controllers
                 //diagnosticCard.VIN = diagnosticCard.VIN?.ToUpper();
                 _context.Add(diagnosticCard);
                 await _context.SaveChangesAsync();
-                if (!register) return RedirectToAction("Index");
+                if (!register)
+                {
+                    this.AddInfoMessage("Изменения сохранены");
+                    return RedirectToAction("Index");
+                }
                 try
                 {
                     await RegisterCard(diagnosticCard.Id);
-                    TempData["MessageText"] =
-                        $"Карта {diagnosticCard.Id} (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО";
+                    this.AddInfoMessage(
+                        $"Карта (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО. "+
+                        "<button>Cформировать бланк</button>");
+                    TempData["GenerateBlankForId"] = diagnosticCard.Id;
                     return RedirectToAction("Index");
                 }
                 catch (RegisterCardException e)
                 {
-                    TempData["ErrorText"] = e.Message;
-                    TempData["MessageText"] =
-                        "Карта сохранена как черновик. Вы можете попытаться отправить ее на регистрацию еще раз несколько позже.";
+                    this.AddErrorMessage(e.Message);
+                    this.AddInfoMessage("Карта сохранена как черновик. Вы можете попытаться отправить ее на регистрацию еще раз несколько позже.");
                     return RedirectToAction("Edit", new {id = diagnosticCard.Id});
                 }
                 catch (NotAuthorizedException)
                 {
-                    return await Logout();
+                    this.AddInfoMessage("Карта сохранена как черновик.");
+                    return await Logout(Url.Action("Edit", new { id = diagnosticCard.Id }));
                 }
             }
 
@@ -261,11 +267,12 @@ namespace WebUI.Controllers
             return View(diagnosticCard);
         }
 
-        private async Task<IActionResult> Logout()
+        private async Task<IActionResult> Logout(string returnUrl = null)
         {
             this.AddErrorMessage("На ЕАИСТО истекла ваша сессия. Войдите еще раз для возобновления сессии.");
             await _signInManager.SignOutAsync();
-            var returnUrl = Request.GetUri().PathAndQuery;
+            if (returnUrl == null)
+                returnUrl = Request.GetUri().PathAndQuery; 
             return RedirectToAction("Login", "Account", new {returnUrl});
         }
 
@@ -443,12 +450,12 @@ namespace WebUI.Controllers
         }
 
         [HttpGet("cards/docx/{diagnosticCardId}")]
-        public async Task<IActionResult> GenerateDocx(int diagnosticCardId, [FromServices] CardDocxGenerator generator)
+        public async Task<IActionResult> GenerateDocx(int diagnosticCardId, [FromServices] CardDocxGenerator generator, bool stamp = true)
         {
             var card = await _context.DiagnosticCards.FindAsync(diagnosticCardId);
             if (card == null)
                 return NotFound();
-            var stream = await generator.Generate(card);
+            var stream = await generator.Generate(card, stamp);
             return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
                 $"DiagCard-{card.Lastname}.docx");
             //return File(stream, "application/octet-stream",
