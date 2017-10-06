@@ -149,12 +149,12 @@
 @section Scripts {
     
 <script type="text/javascript">
-    $("a.btn-register").on("click",
-        function(e) {
-            e.preventDefault();
-            $("#reg_form_card_id").val($(this).attr("data-id"));
-            $("#register_form").submit();
-        });
+    //$("a.btn-register").on("click",
+    //    function(e) {
+    //        e.preventDefault();
+    //        $("#reg_form_card_id").val($(this).attr("data-id"));
+    //        $("#register_form").submit();
+    //    });
     $('#Filter_StartDate').datepicker({
         //"altFormat": "yy-mm-dd",
         //"altField": "#Filter_StartDate",
@@ -163,8 +163,8 @@
         //"altFormat": "yy-mm-dd",
         //"altField": "#Filter_StartDate",
     });
-    var cardId = @TempData["GenerateBlankForId"];
-    if (cardId) {
+    var cardId = @(TempData["GenerateBlankForId"] ?? 0) ;
+    if (cardId > 0) {
         window.open("/cards/docx/" + cardId, "_blank");
     }
 </script>

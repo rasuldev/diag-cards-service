@@ -245,8 +245,7 @@ namespace WebUI.Controllers
                 {
                     await RegisterCard(diagnosticCard.Id);
                     this.AddInfoMessage(
-                        $"Карта (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО. "+
-                        "<button>Cформировать бланк</button>");
+                        $"Карта (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО.");
                     TempData["GenerateBlankForId"] = diagnosticCard.Id;
                     return RedirectToAction("Index");
                 }
@@ -331,7 +330,9 @@ namespace WebUI.Controllers
                 try
                 {
                     await RegisterCard(diagnosticCard.Id);
-                    this.AddInfoMessage($"Карта {diagnosticCard.Id} (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО");
+                    this.AddInfoMessage(
+                        $"Карта (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО.");
+                    TempData["GenerateBlankForId"] = diagnosticCard.Id;
                     return RedirectToAction("Index");
                 }
                 catch (RegisterCardException e)

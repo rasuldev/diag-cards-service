@@ -251,7 +251,7 @@
     </div>
 </div>
 <div class="form-group">
-    <label for="RegisteredDate" class="col-md-2 control-label">Дата регистрации</label>
+    <label asp-for="RegisteredDate" class="col-md-2 control-label"></label>
     <div class="col-md-10">
         <input id="RegisteredDate" class="form-control" readonly="readonly" value="@DateTime.Now.ToString("dd.MM.yyyy")" />
     </div>
