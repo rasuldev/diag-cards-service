@@ -85,7 +85,7 @@ namespace WebUI.Infrastructure
             var div = new TagBuilder("div");
             div.AddCssClass("alert");
             div.AddCssClass($"alert-{blockType}");
-            div.InnerHtml.SetContent(text);
+            div.InnerHtml.SetHtmlContent(text);
             return div;
         }
     }

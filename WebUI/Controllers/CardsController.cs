@@ -244,9 +244,6 @@ namespace WebUI.Controllers
                 try
                 {
                     await RegisterCard(diagnosticCard.Id);
-                    this.AddInfoMessage(
-                        $"Карта (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО.");
-                    TempData["GenerateBlankForId"] = diagnosticCard.Id;
                     return RedirectToAction("Index");
                 }
                 catch (RegisterCardException e)
@@ -330,9 +327,6 @@ namespace WebUI.Controllers
                 try
                 {
                     await RegisterCard(diagnosticCard.Id);
-                    this.AddInfoMessage(
-                        $"Карта (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО.");
-                    TempData["GenerateBlankForId"] = diagnosticCard.Id;
                     return RedirectToAction("Index");
                 }
                 catch (RegisterCardException e)
@@ -541,7 +535,11 @@ namespace WebUI.Controllers
                 diagnosticCard.RegisteredDate = DateTime.Now;
                 _context.Update(diagnosticCard);
                 _context.SaveChanges();
-                //TempData["ResultText"] = "Карта с номером " + id + " отправлена на регистрацию.";
+                this.AddInfoMessage(
+                    $"Карта (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО: " +
+                    "<a href='/cards/docx/7003' class='action-btn btn btn-primary' title='Сформировать бланк'><i class='fa fa-file-powerpoint-o' aria-hidden='true'></i></a>&nbsp;" +
+                    "<a href='/cards/docx/7003?stamp=false' class='action-btn btn btn-primary' title='Сформировать бланк без печати'><i class='fa fa-file-o' aria-hidden='true'></i></a>");
+                TempData["GenerateBlankForId"] = diagnosticCard.Id;
             }
             catch (NotAuthorizedException)
             {
