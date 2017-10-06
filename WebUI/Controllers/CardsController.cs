@@ -201,6 +201,11 @@ namespace WebUI.Controllers
             var diagnosticCard = _context.DiagnosticCards
                 .Include(d => d.User)
                 .SingleOrDefault(m => m.Id == id);
+            if (!User.IsInRole(UserRoles.Admin) && diagnosticCard.UserId != _userManager.GetUserId(User))
+            {
+                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to create from card with cardId={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
+                return NotFound();
+            }
             CreateOrEditInit(diagnosticCard);
             return View(diagnosticCard);
         }
@@ -288,6 +293,13 @@ namespace WebUI.Controllers
             }
             if (diagnosticCard.RegisteredDate != null)
                 return RedirectToAction("Index");
+
+            if (!User.IsInRole(UserRoles.Admin) && diagnosticCard.UserId != _userManager.GetUserId(User))
+            {
+                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to edit card with cardId={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
+                return NotFound();
+            }
+
             //ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", diagnosticCard.UserId);
             return View(diagnosticCard);
         }
@@ -362,6 +374,11 @@ namespace WebUI.Controllers
             if (diagnosticCard.RegisteredDate != null)
                 return RedirectToAction("Index");
 
+            if (!User.IsInRole(UserRoles.Admin) && diagnosticCard.UserId != _userManager.GetUserId(User))
+            {
+                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to delete card with cardId={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
+                return NotFound();
+            }
 
             return View(diagnosticCard);
         }
@@ -372,6 +389,14 @@ namespace WebUI.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var diagnosticCard = await _context.DiagnosticCards.SingleOrDefaultAsync(m => m.Id == id);
+            if (diagnosticCard.RegisteredDate != null)
+                return RedirectToAction("Index");
+
+            if (!User.IsInRole(UserRoles.Admin) && diagnosticCard.UserId != _userManager.GetUserId(User))
+            {
+                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to delete card with cardId={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
+                return NotFound();
+            }
             _context.DiagnosticCards.Remove(diagnosticCard);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -450,6 +475,13 @@ namespace WebUI.Controllers
             var card = await _context.DiagnosticCards.FindAsync(diagnosticCardId);
             if (card == null)
                 return NotFound();
+            
+            if (!User.IsInRole(UserRoles.Admin) && card.UserId != _userManager.GetUserId(User))
+            {
+                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to delete card with cardId={card.Id} that belongs to {card.User?.UserName}");
+                return NotFound();
+            }
+
             var stream = await generator.Generate(card, stamp);
             return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
                 $"DiagCard-{card.Lastname}.docx");
