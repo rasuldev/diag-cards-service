@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Список карт";
 }
-<h2>@ViewData["Title"]</h2>
+<h2>@ViewData["Title"] (всего: @Model.TotalCardsCount)</h2>
 
 @*<p>
     <a asp-action="Create">Добавить новую карту</a>
@@ -36,114 +36,115 @@
 
 <table class="table table-striped">
     <thead>
-        <tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CreatedDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegisteredDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().Fullname)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().VIN)
+        </th>
+        <th>
+            Марка, модель (год)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CardId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().ExpirationDate)
+        </th>
+        @if (User.IsInRole(UserRoles.Admin))
+        {
             <th>
-                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CreatedDate)
+                Пользователь
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegisteredDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().Fullname)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().VIN)
-            </th>
-            <th>
-                Марка, модель (год)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CardId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().ExpirationDate)
-            </th>
-            @if (User.IsInRole(UserRoles.Admin))
-            {
-                <th>
-                    Пользователь
-                </th>
-            }
-            <th></th>
-        </tr>
+        }
+        <th></th>
+    </tr>
     </thead>
     <tbody>
 
-        @foreach (var item in Model.Cards)
+    @foreach (var item in Model.Cards)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegisteredDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fullname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VIN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Manufacturer)
+                @Html.DisplayFor(modelItem => item.Model) (@Html.DisplayFor(modelItem => item.IssueYear))
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CardId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExpirationDate)
+            </td>
+            @if (User.IsInRole(UserRoles.Admin))
             {
-            <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.CreatedDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RegisteredDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Fullname)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.VIN)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Manufacturer)
-                    @Html.DisplayFor(modelItem => item.Model) (@Html.DisplayFor(modelItem => item.IssueYear))
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CardId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RegNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ExpirationDate)
-                </td>
-                @if (User.IsInRole(UserRoles.Admin))
-                {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.User.UserName)
+                    @Html.DisplayFor(modelItem => item.User.UserName)
 
-                    </td>
-                }
-                <td class="col-md-1 container actions">
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Детали">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </td>
+            }
+            <td class="col-md-1 container actions">
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Детали">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </a>
+                <a asp-action="Create" asp-route-id="@item.Id" class="btn btn-primary" title="Создать новую на основе этой">
+                    <i class="fa fa-copy" aria-hidden="true"></i>
+                </a>
+                @if (!item.IsRegistered)
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary" title="Изменить и зарегистрировать">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
                     </a>
-                    <a asp-action="Create" asp-route-id="@item.Id" class="btn btn-primary" title="Создать новую на основе этой">
-                        <i class="fa fa-copy" aria-hidden="true"></i>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Удалить">
+                        <i class="fa fa-times" aria-hidden="true"></i>
                     </a>
-                    @if (!item.IsRegistered)
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary" title="Изменить и зарегистрировать">
-                            <i class="fa fa-pencil" aria-hidden="true"></i>
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Удалить">
-                            <i class="fa fa-times" aria-hidden="true"></i>
-                        </a>
-                        //bool isDayLimitReached = (bool) ViewData["isDayLimitExhausted"];
-                        //string isDisabled = isDayLimitReached ? "disabled" : "";
+                    //bool isDayLimitReached = (bool) ViewData["isDayLimitExhausted"];
+                    //string isDisabled = isDayLimitReached ? "disabled" : "";
                         @*<a href="" data-id="@item.Id" class="btn btn-success @isDisabled btn-register" title="Зарегистрировать">
                             <i class="fa fa-registered" aria-hidden="true"></i>
                         </a>*@
-                    }
-                    else
-                    {
-                        <a asp-action="docx" asp-route-id="@item.Id" class="action-btn btn btn-primary" title="Сформировать бланк">
-                            <i class="fa fa-file-powerpoint-o" aria-hidden="true"></i>
-                        </a>
-                        <a asp-action="docx" asp-route-id="@item.Id" asp-route-stamp="false" class="action-btn btn btn-primary" title="Сформировать бланк без печати">
-                            <i class="fa fa-file-o" aria-hidden="true"></i>
-                        </a>
+                }
+                else
+                {
+                    <a asp-action="docx" asp-route-id="@item.Id" class="action-btn btn btn-primary" title="Сформировать бланк">
+                        <i class="fa fa-file-powerpoint-o" aria-hidden="true"></i>
+                    </a>
+                    <a asp-action="docx" asp-route-id="@item.Id" asp-route-stamp="false" class="action-btn btn btn-primary" title="Сформировать бланк без печати">
+                        <i class="fa fa-file-o" aria-hidden="true"></i>
+                    </a>
 
-                    }
-                </td>
-            </tr>
-                        }
+                }
+            </td>
+        </tr>
+    }
     </tbody>
 
 </table>
+
 @Html.PagerLinks(totalCount: Model.TotalCardsCount, pageSize: 10, visiblePagesCount: 10)
 
 @section Scripts {

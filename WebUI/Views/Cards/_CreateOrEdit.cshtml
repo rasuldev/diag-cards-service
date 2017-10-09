@@ -253,7 +253,7 @@
 <div class="form-group">
     <label asp-for="RegisteredDate" class="col-md-2 control-label"></label>
     <div class="col-md-10">
-        <input id="RegisteredDate" class="form-control" readonly="readonly" value="@DateTime.Now.ToString("dd.MM.yyyy")" />
+        <input id="RegisteredDate" class="form-control" readonly="readonly" value="@DateTime.UtcNow.AddHours(3).ToString("dd.MM.yyyy")" />
     </div>
 </div>
 <div class="form-group">
