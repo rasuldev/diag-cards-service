@@ -102,9 +102,11 @@ namespace WebUI.Controllers
                 .Where(item => item.Patronymic.StartsWith(patronymic));
             }
             if (model.Filter.StartDate != null)
-                cards = cards.Where(item => item.CreatedDate > model.Filter.StartDate);
+                cards = cards.Where(item => item.CreatedDate >= model.Filter.StartDate);
             if (model.Filter.EndDate != null)
-                cards = cards.Where(item => item.CreatedDate < model.Filter.StartDate);
+            {
+                cards = cards.Where(item => item.CreatedDate < model.Filter.EndDate.Value.AddDays(1));
+            }
 
             if (!string.IsNullOrEmpty(model.Filter.Regnumber))
                 cards = cards.Where(item => item.RegNumber.Contains(model.Filter.Regnumber));
@@ -142,7 +144,7 @@ namespace WebUI.Controllers
                     Value = ""
                 }
             };
-            list.AddRange(_context.User.AsNoTracking().Select(user => new SelectListItem()
+            list.AddRange(_context.User.Where(u => u.IsRemoved == false && u.IsApproved == true).AsNoTracking().Select(user => new SelectListItem()
             {
                 Text = user.UserName,
                 Value = user.Id
@@ -237,7 +239,7 @@ namespace WebUI.Controllers
                 diagnosticCard.UserId = _userManager.GetUserId(User);
                 //diagnosticCard.CardId = null;
                 //diagnosticCard.RegisteredDate = null;
-                diagnosticCard.CreatedDate = DateTime.Now;
+                diagnosticCard.CreatedDate = DateTime.UtcNow.AddHours(3); // Moscow time
                 //diagnosticCard.VIN = diagnosticCard.VIN?.ToUpper();
                 _context.Add(diagnosticCard);
                 await _context.SaveChangesAsync();

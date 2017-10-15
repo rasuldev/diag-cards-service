@@ -14,7 +14,7 @@ namespace WebUI.Data.Entities
         public User User { get; set; }
         [Display(Name = "Дата создания")]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow.AddHours(3);
         /// <summary>
         /// Saved in Eaisto date
         /// </summary>
