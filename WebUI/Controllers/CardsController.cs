@@ -571,8 +571,8 @@ namespace WebUI.Controllers
                 _context.SaveChanges();
                 this.AddInfoMessage(
                     $"Карта (рег. знак {diagnosticCard.RegNumber}, ФИО {diagnosticCard.Fullname}) отправлена на регистрацию в ЕАИСТО: " +
-                    "<a href='/cards/docx/7003' class='action-btn btn btn-primary' title='Сформировать бланк'><i class='fa fa-file-powerpoint-o' aria-hidden='true'></i></a>&nbsp;" +
-                    "<a href='/cards/docx/7003?stamp=false' class='action-btn btn btn-primary' title='Сформировать бланк без печати'><i class='fa fa-file-o' aria-hidden='true'></i></a>");
+                    $"<a href='/cards/docx/{diagnosticCard.Id}' class='action-btn btn btn-primary' title='Сформировать бланк'><i class='fa fa-file-powerpoint-o' aria-hidden='true'></i></a>&nbsp;" +
+                    $"<a href='/cards/docx/{diagnosticCard.Id}?stamp=false' class='action-btn btn btn-primary' title='Сформировать бланк без печати'><i class='fa fa-file-o' aria-hidden='true'></i></a>");
                 TempData["GenerateBlankForId"] = diagnosticCard.Id;
             }
             catch (NotAuthorizedException)
