@@ -75,10 +75,10 @@
     @foreach (var item in Model.Cards)
     {
         <tr>
-            <td>
+            <td title="@item.CreatedDate.ToString("dd.MM.yyyy hh:mm:ss")">
                 @Html.DisplayFor(modelItem => item.CreatedDate)
             </td>
-            <td>
+            <td title="@item.RegisteredDate?.ToString("dd.MM.yyyy hh:mm:ss")">
                 @Html.DisplayFor(modelItem => item.RegisteredDate)
             </td>
             <td>

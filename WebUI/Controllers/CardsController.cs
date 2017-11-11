@@ -562,6 +562,8 @@ namespace WebUI.Controllers
                 throw new RegisterCardException("Это карта принадлежит другому пользователю.");
             }
 
+            diagnosticCard.RegisteredDate = DateTime.UtcNow.AddHours(3); // set current date 
+
             try
             {
                 var cardId = await _api.SaveCard(diagnosticCard);
