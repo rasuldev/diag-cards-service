@@ -562,13 +562,21 @@ namespace WebUI.Controllers
                 throw new RegisterCardException("Это карта принадлежит другому пользователю.");
             }
 
-            diagnosticCard.RegisteredDate = DateTime.UtcNow.AddHours(3); // set current date 
-
             try
             {
                 var cardId = await _api.SaveCard(diagnosticCard);
                 diagnosticCard.CardId = cardId;
-                diagnosticCard.RegisteredDate = DateTime.Now;
+                diagnosticCard.RegisteredDate = DateTime.UtcNow.AddHours(3);
+                // Calc expiration date
+                var monthsToAdd = 12;
+                if (diagnosticCard.CardType == CardTypes.Taxi) monthsToAdd = 6;
+                else
+                {
+                    var carAge = diagnosticCard.RegisteredDate.Value.Year - diagnosticCard.IssueYear;
+                    monthsToAdd = (carAge > 7) ? 12 : 24;
+                }
+                diagnosticCard.ExpirationDate = diagnosticCard.RegisteredDate.Value.AddMonths(monthsToAdd).AddDays(-1);
+
                 _context.Update(diagnosticCard);
                 _context.SaveChanges();
                 this.AddInfoMessage(
