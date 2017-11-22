@@ -521,11 +521,12 @@ namespace WebUI.Controllers
         private bool IsDayLimitExceeded()
         {
             int limit = _settings.GetDayLimit(); //_conf.GetValue<int>("DayLimit");
-            DateTime dateTimeNow = DateTime.Now;
+            DateTime dateTimeNow = DateTime.UtcNow.AddHours(3);
             DateTime curDate = new DateTime(dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day);
 
             var registeredCardsList = _context.DiagnosticCards.Where(s => s.RegisteredDate != null)
                 .Where(item => item.RegisteredDate.Value.DayOfYear.Equals(curDate.DayOfYear)).ToList();
+            _logger.LogInformation($"Registered today {curDate} is {registeredCardsList.Count}.");
             return registeredCardsList.Count >= limit;
         }
 
