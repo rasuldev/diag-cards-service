@@ -29,13 +29,13 @@ namespace EaisApi
         /// This storage should have per user behavour (each user has each own storage).
         /// </summary>
         private readonly IUserStorage _userStorage;
-        private const string LoginUrl = "http://eaisto.gibdd.ru/ru/arm/";
-        private const string CaptchaUrl = "http://eaisto.gibdd.ru/common/tool/getcaptcha.php?captcha_id=";
-        private const string DataUrl = "http://eaisto.gibdd.ru/ru/arm/expert/new/";
-        private const string SearchUrl = "http://eaisto.gibdd.ru/ru/arm/expert/dublikat_poisk/";
-        private const string RunningUrl = "http://eaisto.gibdd.ru/ru/arm/expert/new/?get_diag_karta_probeg=";
-        private const string SearchManufacturersUrl = "http://eaisto.gibdd.ru/ru/arm/expert/new/?get_marks=1&query=";
-        private const string SearchModelsUrl = "http://eaisto.gibdd.ru/ru/arm/expert/new/?get_models=1&marka=$man$&query=";
+        private const string LoginUrl = "https://eaisto.gibdd.ru//ru/arm/";
+        private const string CaptchaUrl = "https://eaisto.gibdd.ru/common/tool/getcaptcha.php?captcha_id=";
+        private const string DataUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/";
+        private const string SearchUrl = "https://eaisto.gibdd.ru/ru/arm/expert/dublikat_poisk/";
+        private const string RunningUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/?get_diag_karta_probeg=";
+        private const string SearchManufacturersUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/?get_marks=1&query=";
+        private const string SearchModelsUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/?get_models=1&marka=$man$&query=";
         private static readonly HttpClient Client;
 
         //public string SessionId { get; set; }
