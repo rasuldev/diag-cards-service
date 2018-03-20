@@ -538,7 +538,11 @@ namespace WebUI.Controllers
         private void CreateOrEditInit(DiagnosticCard diagnosticCard = null)
         {
             if (IsDayLimitExceeded())
+            {
                 ViewData["LimitExceeded"] = true;
+                this.AddErrorMessage("ВНИМАНИЕ! Лимит регистраций на сегодня исчерпан.");
+            }
+                
 
             ViewData["CategoriesList"] = Misc.CreateSelectListFrom<VehicleCategory>(diagnosticCard?.Category, "");
             ViewData["CategoryCommonList"] = Misc.CreateSelectListFrom<VehicleCategoryCommon>(diagnosticCard?.CategoryCommon, "");
