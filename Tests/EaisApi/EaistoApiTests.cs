@@ -24,7 +24,7 @@ namespace Tests.EaisApi
 
         private async Task<EaistoApi> SignIn()
         {
-            var api = new EaistoApi(new MemoryStorage());
+            var api = new EaistoApi(new MemoryStorage(), null);
             var captcha = await api.InitRemoteSession();
             var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".jpg");
             using (var file = new FileStream(path, FileMode.Create))
@@ -85,7 +85,7 @@ namespace Tests.EaisApi
         {
             var storage = new MemoryStorage();
             storage.SaveData(new ApiUserData("", ""));
-            var api = new EaistoApi(storage);
+            var api = new EaistoApi(storage, null);
             Assert.ThrowsAsync<NotAuthorizedException>(async () => await api.Search(regNumber: "111"));
         }
 

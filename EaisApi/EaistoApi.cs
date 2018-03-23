@@ -11,6 +11,7 @@ using CsQuery.ExtensionMethods.Internal;
 using CsQuery.Utility;
 using EaisApi.Exceptions;
 using EaisApi.Models;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace EaisApi
@@ -37,6 +38,7 @@ namespace EaisApi
         private const string SearchManufacturersUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/?get_marks=1&query=";
         private const string SearchModelsUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/?get_models=1&marka=$man$&query=";
         private static readonly HttpClient Client;
+        private readonly ILogger<EaistoApi> _logger;
 
         //public string SessionId { get; set; }
         static EaistoApi()
@@ -51,9 +53,10 @@ namespace EaisApi
             Client = new HttpClient(handler);
         }
 
-        public EaistoApi(IUserStorage storage)
+        public EaistoApi(IUserStorage storage, ILogger<EaistoApi> logger)
         {
             _userStorage = storage;
+            _logger = logger;
         }
 
         /// <summary>
@@ -345,6 +348,11 @@ namespace EaisApi
             var html = await response.Content.ReadAsStringAsync();
             var cq = CQ.Create(html);
             var cardId = cq[".second_cont strong"].Text();
+            if (cardId.Any(c => !Char.IsDigit(c)))
+            {
+                _logger?.LogError("cardId is wrong. Received html: " + html);
+            }
+
             return cardId;
             // jQuery(".second_cont strong")
             // http://eaisto.gibdd.ru/ru/arm/expert/new/
