@@ -109,8 +109,6 @@ namespace WebUI
             loggerFactory.AddNLog();
             app.AddNLogWeb();
 
-            app.UseExceptionLogger();
-
             // Localization
             var supportedCultures = new List<CultureInfo>
             {
@@ -136,6 +134,8 @@ namespace WebUI
             }
 
             app.UseStaticFiles();
+
+            app.UseExceptionLogger();
 
             app.UseAuthentication();
 

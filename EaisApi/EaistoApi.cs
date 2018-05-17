@@ -66,6 +66,7 @@ namespace EaisApi
         public async Task<Stream> InitRemoteSession()
         {
             var result = await Client.GetAsync(LoginUrl);
+            
             if (!result.Headers.TryGetValues("Set-cookie", out var cookies))
             {
                 throw new CookieNotFoundException("Session cookie is not found.");

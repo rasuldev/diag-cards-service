@@ -45,6 +45,8 @@ namespace WebUI.Infrastructure
             catch (Exception e)
             {
                 _logger.LogError(e.ToString());
+                if (e.InnerException != null)
+                    _logger.LogError("Inner exception: " + e.InnerException.ToString());
                 throw;
             }
         }
