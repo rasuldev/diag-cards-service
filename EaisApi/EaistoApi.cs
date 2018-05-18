@@ -37,10 +37,14 @@ namespace EaisApi
         private const string RunningUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/?get_diag_karta_probeg=";
         private const string SearchManufacturersUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/?get_marks=1&query=";
         private const string SearchModelsUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/?get_models=1&marka=$man$&query=";
-        private static readonly HttpClient Client;
+        private static HttpClient Client;
         private readonly ILogger<EaistoApi> _logger;
 
         //public string SessionId { get; set; }
+        //public static void SetHttpClient(HttpClient client)
+        //{
+        //    Client = client;
+        //}
         static EaistoApi()
         {
             var handler = new HttpClientHandler
@@ -49,7 +53,7 @@ namespace EaisApi
                 UseCookies = false
                 //CookieContainer = cookies
             };
-            
+
             Client = new HttpClient(handler);
         }
 
@@ -66,7 +70,7 @@ namespace EaisApi
         public async Task<Stream> InitRemoteSession()
         {
             var result = await Client.GetAsync(LoginUrl);
-            
+
             if (!result.Headers.TryGetValues("Set-cookie", out var cookies))
             {
                 throw new CookieNotFoundException("Session cookie is not found.");

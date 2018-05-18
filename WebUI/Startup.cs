@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using EaisApi;
+using Extreme.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -98,6 +101,17 @@ namespace WebUI
             services.AddScoped<IUserStorage>(provider =>
                 new SessionStorage(provider.GetRequiredService<IHttpContextAccessor>()
                     .HttpContext.Session));
+
+            //var proxy = new Socks5ProxyClient("", 1080, "", "");
+            //var handler = new ProxyHandler(proxy)
+            //{
+            //    AllowAutoRedirect = false,
+            //    UseCookies = false
+            //};
+            //var client = new HttpClient(handler);
+            ////var s = client.GetStringAsync("https://ya.ru");
+            ////var ss = s.Result;
+            //EaistoApi.SetHttpClient(client);
             services.AddScoped<EaistoApi>();
         }
 
