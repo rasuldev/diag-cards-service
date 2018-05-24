@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading.Tasks;
@@ -19,6 +20,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using SocksSharp;
+using SocksSharp.Proxy;
 using WebUI.Data;
 using WebUI.Data.Entities;
 using WebUI.Infrastructure;
@@ -102,16 +105,32 @@ namespace WebUI
                 new SessionStorage(provider.GetRequiredService<IHttpContextAccessor>()
                     .HttpContext.Session));
 
-            //var proxy = new Socks5ProxyClient("", 1080, "", "");
-            //var handler = new ProxyHandler(proxy)
+            var settings = new ProxySettings()
+            {
+                Host = Configuration["proxy:host"],
+                Port = int.Parse(Configuration["proxy:port"]),
+                Credentials = new NetworkCredential(Configuration["proxy:login"], Configuration["proxy:password"]),
+            };
+            var proxyClientHandler = new ProxyClientHandler<Socks5>(settings) {UseCookies = false};
+            var client = new HttpClient(proxyClientHandler);
+            EaistoApi.SetHttpClient(client);
+
+            //var proxy = new WebProxy(Configuration["proxy:address"])
             //{
-            //    AllowAutoRedirect = false,
-            //    UseCookies = false
+            //    //Credentials = new NetworkCredential(Configuration["proxy:login"], Configuration["proxy:password"]),
+            //    //BypassProxyOnLocal = true
             //};
-            //var client = new HttpClient(handler);
-            ////var s = client.GetStringAsync("https://ya.ru");
-            ////var ss = s.Result;
+            //var httpClientHandler = new HttpClientHandler()
+            //{
+            //    Proxy = proxy,
+            //    AllowAutoRedirect = false,
+            //    UseCookies = false,
+            //    UseProxy = true,
+
+            //};
+            //var client = new HttpClient(httpClientHandler);
             //EaistoApi.SetHttpClient(client);
+
             services.AddScoped<EaistoApi>();
         }
 

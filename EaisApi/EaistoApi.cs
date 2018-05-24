@@ -41,20 +41,21 @@ namespace EaisApi
         private readonly ILogger<EaistoApi> _logger;
 
         //public string SessionId { get; set; }
-        //public static void SetHttpClient(HttpClient client)
-        //{
-        //    Client = client;
-        //}
+        public static void SetHttpClient(HttpClient client)
+        {
+            Client = client;
+        }
         static EaistoApi()
         {
-            var handler = new HttpClientHandler
-            {
-                AllowAutoRedirect = false,
-                UseCookies = false
-                //CookieContainer = cookies
-            };
+            //var handler = new HttpClientHandler
+            //{
+            //    AllowAutoRedirect = false,
+            //    UseCookies = false,
+            //    UseProxy = true,
+            //    //CookieContainer = cookies
+            //};
 
-            Client = new HttpClient(handler);
+            //Client = new HttpClient(handler);
         }
 
         public EaistoApi(IUserStorage storage, ILogger<EaistoApi> logger)
@@ -69,6 +70,8 @@ namespace EaisApi
         /// <returns></returns>
         public async Task<Stream> InitRemoteSession()
         {
+            //var res = await Client.GetStringAsync("http://ya.ru");
+            //_logger.LogInformation("Response from ya.ru" + res);
             var result = await Client.GetAsync(LoginUrl);
 
             if (!result.Headers.TryGetValues("Set-cookie", out var cookies))
