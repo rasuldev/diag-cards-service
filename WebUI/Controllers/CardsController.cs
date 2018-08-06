@@ -501,12 +501,14 @@ namespace WebUI.Controllers
         }
 
         [HttpGet("cards/setup")]
+        [Authorize(Roles = UserRoles.Admin)]
         public IActionResult SetupDayLimit()
         {
             return View(_settings.GetDayLimit());
         }
 
         [HttpPost("cards/setup")]
+        [Authorize(Roles = UserRoles.Admin)]
         public IActionResult SetupDayLimit(int limit)
         {
             if (_settings.SetDayLimit(limit))
