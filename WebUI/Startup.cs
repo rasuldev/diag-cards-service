@@ -105,15 +105,31 @@ namespace WebUI
                 new SessionStorage(provider.GetRequiredService<IHttpContextAccessor>()
                     .HttpContext.Session));
 
-            var settings = new ProxySettings()
+            // Proxy
+            var useProxy = false;
+            if (useProxy)
             {
-                Host = Configuration["proxy:host"],
-                Port = int.Parse(Configuration["proxy:port"]),
-                Credentials = new NetworkCredential(Configuration["proxy:login"], Configuration["proxy:password"]),
-            };
-            var proxyClientHandler = new ProxyClientHandler<Socks5>(settings) {UseCookies = false};
-            var client = new HttpClient(proxyClientHandler);
-            EaistoApi.SetHttpClient(client);
+                var settings = new ProxySettings()
+                {
+                    Host = Configuration["proxy:host"],
+                    Port = int.Parse(Configuration["proxy:port"]),
+                    Credentials = new NetworkCredential(Configuration["proxy:login"], Configuration["proxy:password"]),
+                };
+                var proxyClientHandler = new ProxyClientHandler<Socks5>(settings) {UseCookies = false};
+                var client = new HttpClient(proxyClientHandler);
+                EaistoApi.SetHttpClient(client);
+            }
+            else
+            {
+                var handler = new HttpClientHandler
+                {
+                    AllowAutoRedirect = false,
+                    UseCookies = false,
+                    //CookieContainer = cookies
+                };
+                var client = new HttpClient(handler);
+                EaistoApi.SetHttpClient(client);
+            }
 
             //var proxy = new WebProxy(Configuration["proxy:address"])
             //{

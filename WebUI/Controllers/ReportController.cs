@@ -60,7 +60,7 @@ namespace WebUI.Controllers
                 }
 
                 //var stream = await generator.Generate(card, stamp);
-                return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv",
+                return File(Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(sb.ToString())).ToArray(), "text/csv",
                     $"Отчет за {filter.Start?.ToString("dd.MM.yyyy") ?? "_"} - {filter.End?.ToString("dd.MM.yyyy")}.csv");
             }
                 //return RedirectToAction("Index");
