@@ -36,7 +36,7 @@ namespace WebUI.Controllers
     {
         private readonly AppDbContext _context;
         readonly UserManager<User> _userManager;
-        bool isAdmin;
+        //bool isAdminOrSpectator;
         private readonly Pager _pager;
         readonly EaistoApi _api;
         readonly IConfiguration _conf;
@@ -63,24 +63,24 @@ namespace WebUI.Controllers
             //this.AddInfoMessage("Изменения сохранены 4");
             var page = _pager.CurrentPage;
             var UserId = _userManager.GetUserId(User);
-            isAdmin = User.IsInRole(UserRoles.Admin);
+            var isAdminOrSpectator = User.IsInRole(UserRoles.Admin) || User.IsInRole(UserRoles.Spectator);
 
             if (model.Filter.Status == null)
                 model.Filter.Status = CardStatusEnum.All;
 
             ViewData["CardStatusEnum"] = Misc.CreateSelectListFrom<CardStatusEnum>(model.Filter.Status);
             ViewData["SortBy"] = model.Filter.SortBy;
-            ViewData["isAdmin"] = isAdmin;
+            //ViewData["isAdminOrSpectator"] = isAdminOrSpectator;
 
             //var card = _context.DiagnosticCards.First();
             //card.UserId = UserId;
             //_context.SaveChanges();
 
-            var cards = isAdmin
+            var cards = isAdminOrSpectator
                 ? _context.DiagnosticCards.Include(d => d.User)
                 : _context.DiagnosticCards.Include(d => d.User).Where(item => item.UserId.Equals(UserId));
 
-            if (isAdmin)
+            if (isAdminOrSpectator)
             {
                 if (!string.IsNullOrEmpty(model.Filter.UserId))
                     cards = cards.Where(item => item.User.Id == model.Filter.UserId);

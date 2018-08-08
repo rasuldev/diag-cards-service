@@ -20,7 +20,7 @@
         @Html.DropDownListFor(m => m.Filter.Status, (SelectList)ViewData["CardStatusEnum"], new { @class = "form-control" })
 
         @{
-            if (User.IsInRole(UserRoles.Admin))
+            if (User.IsInRole(UserRoles.Admin) || User.IsInRole(UserRoles.Spectator))
             {
                 @Html.DropDownListFor(m => m.Filter.UserId, (SelectList)ViewData["UsersList"], new { @class = "form-control" })
             }
@@ -36,39 +36,39 @@
 
 <table class="table table-striped">
     <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CreatedDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegisteredDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().Fullname)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().VIN)
-        </th>
-        <th>
-            Марка, модель (год)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CardId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegNumber)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().ExpirationDate)
-        </th>
-        @if (User.IsInRole(UserRoles.Admin))
-        {
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CreatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegisteredDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().Fullname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().VIN)
+            </th>
+            <th>
+                Марка, модель (год)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().CardId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().RegNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cards.FirstOrDefault().ExpirationDate)
+            </th>
+            @if (User.IsInRole(UserRoles.Admin) || User.IsInRole(UserRoles.Spectator))
+            {
             <th>
                 Пользователь
             </th>
-        }
-        <th></th>
-    </tr>
+            }
+            <th></th>
+        </tr>
     </thead>
     <tbody>
 
@@ -100,7 +100,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.ExpirationDate)
             </td>
-            @if (User.IsInRole(UserRoles.Admin))
+            @if (User.IsInRole(UserRoles.Admin) || User.IsInRole(UserRoles.Spectator))
             {
                 <td>
                     @Html.DisplayFor(modelItem => item.User.UserName)
