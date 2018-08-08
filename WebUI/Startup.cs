@@ -154,9 +154,9 @@ namespace WebUI
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // Configuring NLog
-            env.ConfigureNLog("nlog.config");
-            loggerFactory.AddNLog();
-            app.AddNLogWeb();
+            //env.ConfigureNLog("nlog.config");
+            //loggerFactory.AddNLog();
+            //app.AddNLogWeb();
 
             // Localization
             var supportedCultures = new List<CultureInfo>

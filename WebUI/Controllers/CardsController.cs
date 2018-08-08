@@ -537,7 +537,7 @@ namespace WebUI.Controllers
 
             var registeredCardsList = _context.DiagnosticCards.Where(s => s.RegisteredDate != null)
                 .Where(item => item.RegisteredDate.Value.DayOfYear.Equals(curDate.DayOfYear)).ToList();
-            _logger.LogInformation($"Registered today {curDate} is {registeredCardsList.Count}.");
+            _logger.LogInformation($"Registered today {dateTimeNow} is {registeredCardsList.Count}. Limit: {limit}");
             return registeredCardsList.Count >= limit;
         }
 
