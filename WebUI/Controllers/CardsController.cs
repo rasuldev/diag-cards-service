@@ -30,7 +30,8 @@ using WebUI.Models.CardsViewModels;
 
 namespace WebUI.Controllers
 {
-    [Authorize]
+    //[Authorize(Roles = UserRoles.Admin + "," + UserRoles.Local)]
+    [Authorize(Roles = UserRoles.All)]
     public class CardsController : Controller
     {
         private readonly AppDbContext _context;
@@ -194,6 +195,8 @@ namespace WebUI.Controllers
         // GET: Cards/Create
         public async Task<IActionResult> Create(int? id)
         {
+            if (User.IsInRole(UserRoles.Spectator))
+                return RedirectToAction("Index");
             if (id == null)
             {
                 CreateOrEditInit();
@@ -213,6 +216,7 @@ namespace WebUI.Controllers
         }
 
         [HttpGet("cards/createfromfind")]
+        [Authorize(Roles = UserRoles.NotSpectator)]
         public async Task<IActionResult> CreateFromFind(string vin, string bodyNumber, string frameNumber, string regNumber)
         {
             var card = new DiagnosticCard
@@ -231,6 +235,7 @@ namespace WebUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = UserRoles.NotSpectator)]
         public async Task<IActionResult> Create([Bind("UserId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate,CardType")] DiagnosticCard diagnosticCard, bool register = false)
         {
             if (ModelState.IsValid)
@@ -257,7 +262,7 @@ namespace WebUI.Controllers
                 {
                     this.AddErrorMessage(e.Message);
                     this.AddInfoMessage("Карта сохранена как черновик. Вы можете попытаться отправить ее на регистрацию еще раз несколько позже.");
-                    return RedirectToAction("Edit", new {id = diagnosticCard.Id});
+                    return RedirectToAction("Edit", new { id = diagnosticCard.Id });
                 }
                 catch (NotAuthorizedException)
                 {
@@ -275,11 +280,12 @@ namespace WebUI.Controllers
             this.AddErrorMessage("На ЕАИСТО истекла ваша сессия. Войдите еще раз для возобновления сессии.");
             await _signInManager.SignOutAsync();
             if (returnUrl == null)
-                returnUrl = Request.GetUri().PathAndQuery; 
-            return RedirectToAction("Login", "Account", new {returnUrl});
+                returnUrl = Request.GetUri().PathAndQuery;
+            return RedirectToAction("Login", "Account", new { returnUrl });
         }
 
         // GET: Cards/Edit/5
+        [Authorize(Roles = UserRoles.NotSpectator)]
         public async Task<IActionResult> Edit(int? id)
         {
             CreateOrEditInit();
@@ -311,6 +317,7 @@ namespace WebUI.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = UserRoles.NotSpectator)]
         public async Task<IActionResult> Edit(int id, [Bind("UserId,Id,CardId,Lastname,Firstname,Patronymic,VIN,IssueYear,Manufacturer,Model,BodyNumber,FrameNumber,Running,RegNumber,Weight,Category,CategoryCommon,TyreManufacturer,AllowedMaxWeight,FuelType,BrakeType,DocumentType,IsForeigner,DocumentSeries,DocumentNumber,DocumentIssueDate,DocumentIssuer,Note,ExpirationDate,CardType,CreatedDate")] DiagnosticCard diagnosticCard, bool register = false)
         {
             CreateOrEditInit();
@@ -347,7 +354,7 @@ namespace WebUI.Controllers
                 {
                     this.AddErrorMessage(e.Message);
                     this.AddInfoMessage("Изменения сохранены. Вы можете попытаться отправить карту на регистрацию еще раз несколько позже.");
-                    return RedirectToAction("Edit", new {id = diagnosticCard.Id});
+                    return RedirectToAction("Edit", new { id = diagnosticCard.Id });
                 }
                 catch (NotAuthorizedException)
                 {
@@ -358,6 +365,7 @@ namespace WebUI.Controllers
         }
 
         // GET: Cards/Delete/5
+        [Authorize(Roles = UserRoles.NotSpectator)]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -388,6 +396,7 @@ namespace WebUI.Controllers
         // POST: Cards/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = UserRoles.NotSpectator)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var diagnosticCard = await _context.DiagnosticCards.SingleOrDefaultAsync(m => m.Id == id);
@@ -417,7 +426,7 @@ namespace WebUI.Controllers
             // Method is not working
             if (model.Filter != null)
             {
-               var results = await _api.Search(model.Filter.Vin, model.Filter.RegNumber, model.Filter.TicketSeries, model.Filter.TicketNumber, model.Filter.BodyNumber, model.Filter.FrameNumber);
+                var results = await _api.Search(model.Filter.Vin, model.Filter.RegNumber, model.Filter.TicketSeries, model.Filter.TicketNumber, model.Filter.BodyNumber, model.Filter.FrameNumber);
                 model.Results = results;
             }
             return View(model);
@@ -459,7 +468,7 @@ namespace WebUI.Controllers
             {
                 var runningInfo = await _api.GetVehicleRunning(vin);
                 if (runningInfo == null) return new { error = "no info" }.ToJSON();
-                return new {running = runningInfo.Running, date = runningInfo.Date}.ToJSON();
+                return new { running = runningInfo.Running, date = runningInfo.Date }.ToJSON();
             }
             catch (NotAuthorizedException e)
             {
@@ -477,15 +486,15 @@ namespace WebUI.Controllers
             var card = await _context.DiagnosticCards.FindAsync(diagnosticCardId);
             if (card == null)
                 return NotFound();
-            
+
             if (!User.IsInRole(UserRoles.Admin) && card.UserId != _userManager.GetUserId(User))
             {
-                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to delete card with cardId={card.Id} that belongs to {card.User?.UserName}");
+                _logger.LogCritical($"{_userManager.GetUserName(User)} tried to generate docx for card with cardId={card.Id} that belongs to {card.User?.UserName}");
                 return NotFound();
             }
 
             var stream = await generator.Generate(card, stamp);
-            return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", 
+            return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 $"DiagCard-{card.Lastname}.docx");
             //return File(stream, "application/octet-stream",
             //    $"DiagCard-{card.Lastname}.docx");
@@ -544,7 +553,7 @@ namespace WebUI.Controllers
                 ViewData["LimitExceeded"] = true;
                 this.AddErrorMessage("ВНИМАНИЕ! Лимит регистраций на сегодня исчерпан.");
             }
-                
+
 
             ViewData["CategoriesList"] = Misc.CreateSelectListFrom<VehicleCategory>(diagnosticCard?.Category, "");
             ViewData["CategoryCommonList"] = Misc.CreateSelectListFrom<VehicleCategoryCommon>(diagnosticCard?.CategoryCommon, "");

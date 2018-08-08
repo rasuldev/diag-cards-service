@@ -34,14 +34,21 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Cards" asp-action="Create">Создать карту</a></li>
+                    @if (!User.IsInRole(UserRoles.Spectator))
+                    {
+                        <li><a asp-area="" asp-controller="Cards" asp-action="Create">Создать карту</a></li>
+                    }
                     <li><a asp-area="" asp-controller="Cards" asp-action="Index">Список карт</a></li>
                     <li><a asp-area="" asp-controller="Cards" asp-action="Search">Поиск</a></li>
                     @if (User.IsInRole(UserRoles.Admin))
-                    {
-                        <li><a asp-area="" asp-controller="Users" asp-action="Index">Пользователи</a></li>
-                        <li><a asp-area="" asp-controller="Cards" asp-action="SetupDayLimit">Настройки</a></li>
-                    }
+    {
+                <li><a asp-area="" asp-controller="Users" asp-action="Index">Пользователи</a></li>
+                <li><a asp-area="" asp-controller="Cards" asp-action="SetupDayLimit">Настройки</a></li>
+}
+                    @if (User.IsInRole(UserRoles.Admin) || User.IsInRole(UserRoles.Spectator))
+    {
+                <li><a asp-area="" asp-controller="Report" asp-action="Index">Отчет</a></li>
+}
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>

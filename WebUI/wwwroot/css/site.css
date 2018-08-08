@@ -84,3 +84,7 @@ div.messages .alert {
 .dl-horizontal.card-info dt {
     width: 300px;
 }
+
+.input-validation-error {
+    border: 1px red solid;
+}

@@ -193,6 +193,8 @@ namespace WebUI
                 var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 SecurityRoutines.CreateAdminUser(userManager, Configuration["admin:login"],
                     Configuration["admin:password"]).Wait();
+                SecurityRoutines.CreateSpectatorUser(userManager, Configuration["spectator:login"],
+                    Configuration["spectator:password"]).Wait();
             }
             
 

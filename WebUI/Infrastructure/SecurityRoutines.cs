@@ -20,5 +20,18 @@ namespace WebUI.Infrastructure
                 await userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, UserRoles.Admin, ClaimValueTypes.String));
             }
         }
+
+        public static async Task CreateSpectatorUser(UserManager<User> userManager, string username, string password)
+        {
+            var user = new User { UserName = username /*, Email = model.Email */ , IsApproved = true };
+            var spectator = await userManager.FindByNameAsync(username);
+            //var r = await userManager.DeleteAsync(admin);
+            //admin = await userManager.FindByNameAsync(username);
+            if (spectator == null)
+            {
+                await userManager.CreateAsync(user, password);
+                await userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, UserRoles.Spectator, ClaimValueTypes.String));
+            }
+        }
     }
 }
