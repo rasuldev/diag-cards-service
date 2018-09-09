@@ -30,7 +30,7 @@ namespace EaisApi
         /// This storage should have per user behavour (each user has each own storage).
         /// </summary>
         private readonly IUserStorage _userStorage;
-        private const string LoginUrl = "https://eaisto.gibdd.ru//ru/arm/";
+        private const string LoginUrl = "https://eaisto.gibdd.ru/ru/arm/";
         private const string CaptchaUrl = "https://eaisto.gibdd.ru/common/tool/getcaptcha.php?captcha_id=";
         private const string DataUrl = "https://eaisto.gibdd.ru/ru/arm/expert/new/";
         private const string SearchUrl = "https://eaisto.gibdd.ru/ru/arm/expert/dublikat_poisk/";
@@ -72,6 +72,7 @@ namespace EaisApi
             //try
             //{
             //    //var res = await Client.GetStringAsync("https://tooba.site");
+            //    //var res = await Client.GetStringAsync("http://ya.ru");
             //    var res = await Client.GetStringAsync(LoginUrl);
             //    //_logger.LogInformation("Response from ya.ru" + res);
             //}
@@ -79,7 +80,7 @@ namespace EaisApi
             //{
             //    _logger.LogError(e.ToString());
             //}
-            
+
             var result = await Client.GetAsync(LoginUrl);
 
             if (!result.Headers.TryGetValues("Set-cookie", out var cookies))

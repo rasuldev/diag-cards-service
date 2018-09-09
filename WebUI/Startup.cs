@@ -106,7 +106,7 @@ namespace WebUI
                     .HttpContext.Session));
 
             // Proxy
-            var useProxy = false;
+            var useProxy = true;
             if (useProxy)
             {
                 var settings = new ProxySettings()
