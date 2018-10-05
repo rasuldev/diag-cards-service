@@ -177,6 +177,7 @@ namespace EaisApi
             });
             request.Content = content;
             var result = await Client.SendAsync(request);
+            //var contentStr = await result.Content.ReadAsStringAsync();
             var location = result.Headers.Location;
             // on success we should be redirected. If no, check for wrong captcha
             if (location == null)
