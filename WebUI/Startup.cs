@@ -115,7 +115,12 @@ namespace WebUI
                     Port = int.Parse(Configuration["proxy:port"]),
                     Credentials = new NetworkCredential(Configuration["proxy:login"], Configuration["proxy:password"]),
                 };
-                var proxyClientHandler = new ProxyClientHandler<Socks5>(settings) {UseCookies = false};
+                var proxyClientHandler = new ProxyClientHandler<Socks5>(settings)
+                {
+                    UseCookies = false,
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; },
+
+                };
                 var client = new HttpClient(proxyClientHandler);
                 EaistoApi.SetHttpClient(client);
             }
@@ -125,8 +130,12 @@ namespace WebUI
                 {
                     AllowAutoRedirect = false,
                     UseCookies = false,
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; },
+                    //SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls,
+                    //CheckCertificateRevocationList = false
                     //CookieContainer = cookies
                 };
+
                 var client = new HttpClient(handler);
                 EaistoApi.SetHttpClient(client);
             }
