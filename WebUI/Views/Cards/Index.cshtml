@@ -14,8 +14,8 @@
         <input asp-for="Filter.Regnumber" placeholder="Регистрационный знак" class="form-control" style="width: 200px" />
         <input asp-for="Filter.Vin" placeholder="VIN" class="form-control" />
         <input asp-for="Filter.Fullname" placeholder="ФИО" class="form-control" />
-        <input asp-for="Filter.StartDate" value="@Model.Filter.StartDate?.ToString("dd.MM.yyyy")" placeholder="Дата создания: от" class="form-control" />
-        <input asp-for="Filter.EndDate" value="@Model.Filter.EndDate?.ToString("dd.MM.yyyy")" placeholder="Дата создания: до" class="form-control" />
+        <input asp-for="Filter.StartDate" value="@Model.Filter.StartDate?.ToString("dd.MM.yyyy")" placeholder="Дата: от" class="form-control" />
+        <input asp-for="Filter.EndDate" value="@Model.Filter.EndDate?.ToString("dd.MM.yyyy")" placeholder="Дата: до" class="form-control" />
 
         @Html.DropDownListFor(m => m.Filter.Status, (SelectList)ViewData["CardStatusEnum"], new { @class = "form-control" })
 

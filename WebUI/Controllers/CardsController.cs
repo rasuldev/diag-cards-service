@@ -103,10 +103,14 @@ namespace WebUI.Controllers
                 .Where(item => item.Patronymic.StartsWith(patronymic));
             }
             if (model.Filter.StartDate != null)
-                cards = cards.Where(item => item.CreatedDate >= model.Filter.StartDate);
+                cards = model.Filter.Status != CardStatusEnum.Registered ?
+                    cards.Where(item => item.CreatedDate >= model.Filter.StartDate) :
+                    cards.Where(item => item.RegisteredDate >= model.Filter.StartDate);
             if (model.Filter.EndDate != null)
             {
-                cards = cards.Where(item => item.CreatedDate < model.Filter.EndDate.Value.AddDays(1));
+                cards = model.Filter.Status != CardStatusEnum.Registered ?
+                     cards.Where(item => item.CreatedDate < model.Filter.EndDate.Value.AddDays(1)) :
+                     cards.Where(item => item.RegisteredDate < model.Filter.EndDate.Value.AddDays(1));
             }
 
             if (!string.IsNullOrEmpty(model.Filter.Regnumber))
