@@ -612,7 +612,7 @@ namespace WebUI.Controllers
             }
             catch (CheckCardException e)
             {
-                _logger.LogError(e.ToString());
+                _logger.LogError(e.ToString() + $"; result={e.CheckResult}");
                 switch (e.CheckResult)
                 {
                     case CheckResults.CouponAlreadyExists:
