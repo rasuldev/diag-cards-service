@@ -88,3 +88,7 @@ div.messages .alert {
 .input-validation-error {
     border: 1px red solid;
 }
+
+.pager a.selected {
+    background-color: #eee;
+}
