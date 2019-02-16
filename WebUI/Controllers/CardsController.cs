@@ -129,6 +129,9 @@ namespace WebUI.Controllers
                     break;
             }
 
+            cards = model.Filter.Status == CardStatusEnum.Deleted ? cards.Where(c => c.Deleted) : cards.Where(c => !c.Deleted);
+
+
             model.TotalCardsCount = await cards.CountAsync();
             model.Cards = SortList(cards, SortParamEnum.CreationDate_DESC).Skip(10 * (page - 1)).Take(10).ToList();
             return View(model);
@@ -412,7 +415,9 @@ namespace WebUI.Controllers
                 _logger.LogCritical($"{_userManager.GetUserName(User)} tried to delete card with cardId={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
                 return NotFound();
             }
-            _context.DiagnosticCards.Remove(diagnosticCard);
+
+            diagnosticCard.Deleted = true;
+            _context.DiagnosticCards.Update(diagnosticCard);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }

@@ -23,6 +23,7 @@ namespace WebUI.Infrastructure
                 [CardStatusEnum.All] = "Выберите статус карты",
                 [CardStatusEnum.Registered] = "Зарегистрированные",
                 [CardStatusEnum.Unregistered] = "Незарегистрированные",
+                [CardStatusEnum.Deleted] = "Удаленные",
             };
 
         private static readonly Dictionary<FuelTypes, string> FuelTypeLabels =

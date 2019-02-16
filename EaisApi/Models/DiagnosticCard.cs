@@ -102,5 +102,7 @@ namespace EaisApi.Models
         [Display(Name = "Срок действия карты")]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? ExpirationDate { get; set; }
+
+        public bool Deleted { get; set; } = false;
     }
 }

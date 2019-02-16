@@ -9,6 +9,7 @@ namespace WebUI.Models
     {
         All,
         Registered,
-        Unregistered
+        Unregistered,
+        Deleted
     }
 }

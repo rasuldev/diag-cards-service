@@ -74,7 +74,7 @@
 
     @foreach (var item in Model.Cards)
     {
-        <tr>
+        <tr class="@(item.Deleted ? "deleted" : "not-deleted")">
             <td title="@item.CreatedDate.ToString("dd.MM.yyyy HH:mm:ss")">
                 @Html.DisplayFor(modelItem => item.CreatedDate)
             </td>
@@ -107,38 +107,43 @@
 
                 </td>
             }
-            <td class="col-md-1 container actions">
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Детали">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                </a>
-                <a asp-action="Create" asp-route-id="@item.Id" class="btn btn-primary" title="Создать новую на основе этой">
-                    <i class="fa fa-copy" aria-hidden="true"></i>
-                </a>
-                @if (!item.IsRegistered)
-                {
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary" title="Изменить и зарегистрировать">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                <td class="col-md-1 container actions">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Детали">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
                     </a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Удалить">
-                        <i class="fa fa-times" aria-hidden="true"></i>
+                    <a asp-action="Create" asp-route-id="@item.Id" class="btn btn-primary" title="Создать новую на основе этой">
+                        <i class="fa fa-copy" aria-hidden="true"></i>
                     </a>
-                    //bool isDayLimitReached = (bool) ViewData["isDayLimitExhausted"];
-                    //string isDisabled = isDayLimitReached ? "disabled" : "";
-                        @*<a href="" data-id="@item.Id" class="btn btn-success @isDisabled btn-register" title="Зарегистрировать">
-                            <i class="fa fa-registered" aria-hidden="true"></i>
-                        </a>*@
-                }
-                else
-                {
-                    <a asp-action="docx" asp-route-id="@item.Id" class="action-btn btn btn-primary" title="Сформировать бланк">
-                        <i class="fa fa-file-powerpoint-o" aria-hidden="true"></i>
-                    </a>
-                    <a asp-action="docx" asp-route-id="@item.Id" asp-route-stamp="false" class="action-btn btn btn-primary" title="Сформировать бланк без печати">
-                        <i class="fa fa-file-o" aria-hidden="true"></i>
-                    </a>
+                    @if (item.IsRegistered)
+                    {
+                        <a asp-action="docx" asp-route-id="@item.Id" class="action-btn btn btn-primary" title="Сформировать бланк">
+                            <i class="fa fa-file-powerpoint-o" aria-hidden="true"></i>
+                        </a>
+                        <a asp-action="docx" asp-route-id="@item.Id" asp-route-stamp="false" class="action-btn btn btn-primary" title="Сформировать бланк без печати">
+                            <i class="fa fa-file-o" aria-hidden="true"></i>
+                        </a>
 
-                }
-            </td>
+                        //bool isDayLimitReached = (bool) ViewData["isDayLimitExhausted"];
+                        //string isDisabled = isDayLimitReached ? "disabled" : "";
+                        @*<a href="" data-id="@item.Id" class="btn btn-success @isDisabled btn-register" title="Зарегистрировать">
+                <i class="fa fa-registered" aria-hidden="true"></i>
+            </a>*@
+                    }
+                    else if (!item.Deleted)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary" title="Изменить и зарегистрировать">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Удалить">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </a>
+
+                    }
+                    else
+                    {
+                        
+                    }
+                </td>
         </tr>
     }
     </tbody>
