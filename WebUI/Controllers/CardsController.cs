@@ -582,7 +582,7 @@ namespace WebUI.Controllers
             }
 
             var diagnosticCard = _context.DiagnosticCards.SingleOrDefault(m => m.Id == id);
-            if (diagnosticCard.UserId != _userManager.GetUserId(User))
+            if (!User.IsInRole(UserRoles.Admin) && diagnosticCard.UserId != _userManager.GetUserId(User))
             {
                 _logger.LogCritical($"{_userManager.GetUserName(User)} tried to register card with cardId={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
                 throw new RegisterCardException("Это карта принадлежит другому пользователю.");
@@ -636,10 +636,14 @@ namespace WebUI.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e.ToString());
-                if (!await _api.RefreshCardFromEaistoSearch(diagnosticCard))
+                if (await _api.RefreshCardFromEaistoSearch(diagnosticCard))
                 {
-                    throw new RegisterCardException("При регистрации карты в ЕАИСТО произошла ошибка! Попробуйте еще раз позже.");
+                    diagnosticCard.RegisteredDate = DateTime.UtcNow.AddHours(3);
+                    await _context.SaveChangesAsync();
+                    return;
                 }
+                throw new RegisterCardException("При регистрации карты в ЕАИСТО произошла ошибка! Попробуйте еще раз позже.");
+
             }
         }
     }

@@ -405,6 +405,7 @@ namespace EaisApi
                 {
                     card.CardId = cardInfo.BlankNumber.Replace("/", "");
                     card.ExpirationDate = DateTime.ParseExact(cardInfo.ExpirationDate, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                    //card.RegisteredDate = DateTime.ParseExact(cardInfo.ExpirationDate, "dd.MM.yyyy", CultureInfo.InvariantCulture);
                     return true;
                 }
             }
