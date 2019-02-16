@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using WebUI.Data;
 using WebUI.Data.Entities;
 using WebUI.Infrastructure;
 using WebUI.Models;
@@ -27,12 +29,13 @@ namespace WebUI.Controllers
         private readonly ILogger _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
+        private readonly AppDbContext _context;
 
         public AccountController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+            ILogger<AccountController> logger, IConfiguration configuration, IHostingEnvironment hostingEnvironment, AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -40,6 +43,7 @@ namespace WebUI.Controllers
             _logger = logger;
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _context = context;
         }
 
         [TempData]
@@ -82,7 +86,9 @@ namespace WebUI.Controllers
                 if (checkResult.Succeeded)
                 {
                     string login = _configuration["eaisto:login"];
-                    string pass = _configuration["eaisto:password"];
+                    //string pass = _configuration["eaisto:password"];
+                    var credential = await _context.EaistoCredentials.AsNoTracking().FirstAsync();
+                    string pass = credential.Password;
                     try
                     {
                         await api.SignIn(login, pass, model.CaptchaText);
@@ -474,6 +480,46 @@ namespace WebUI.Controllers
         {
             return View();
         }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ChangeEaistoPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ChangeEaistoPassword(ChangeEaistoPasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(model.LocalLogin);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Неверный логин или пароль");
+                    return View(model);
+                }
+                var checkResult = await _signInManager.CheckPasswordSignInAsync(user, model.LocalPassword, lockoutOnFailure: false);
+                //var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                if (checkResult.Succeeded)
+                {
+                    var credentials = await _context.EaistoCredentials.FirstAsync();
+                    credentials.Password = model.EaistoPassword;
+                    await _context.SaveChangesAsync();
+                    this.AddInfoMessage("Пароль изменен");
+                    return RedirectToAction("ChangeEaistoPassword");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Неверный логин или пароль");
+                    return View(model);
+                }
+            }
+            return View(model);
+        }
+
 
         #region Helpers
 

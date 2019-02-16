@@ -13,6 +13,7 @@ namespace WebUI.Data
     public class AppDbContext : IdentityDbContext<User>
     {
         public DbSet<DiagnosticCard> DiagnosticCards { get; set; }
+        public DbSet<EaistoCredential> EaistoCredentials { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
