@@ -121,9 +121,9 @@ namespace Tests.EaisApi
                     Note = "Тестовое примечание",
                     ExpirationDate = new DateTime(2018, 08, 09),
                 };
-                var id = await _api.SaveCard(info);
-                Assert.NotNull(id);
-                Assert.That(id, Does.Match(@"\d+"));
+                await _api.SaveCard(info);
+                Assert.NotNull(info.CardId);
+                Assert.That(info.CardId, Does.Match(@"\d+"));
             }
             catch (CheckCardException e)
             {

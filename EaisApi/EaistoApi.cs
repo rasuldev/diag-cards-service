@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -315,18 +316,25 @@ namespace EaisApi
         }
 
         /// <summary>
-        /// Saves card and returns card id. 
+        /// Saves card and sets it card id. 
         /// Throws CheckCardException if form didn't pass validation on server.
         /// See <see cref="CheckResults"/> enum for details.
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        public async Task<string> SaveCard(DiagnosticCard info)
+        public async Task SaveCard(DiagnosticCard info)
         {
             // check form
             var checkResult = await CheckForm(info);
             if (checkResult != CheckResults.Success)
             {
+                if (checkResult == CheckResults.DuplicateToday)
+                {
+                    // it means that card has been registered
+                    // so we try to get card info using search
+                    if (await RefreshCardFromEaistoSearch(info))
+                        return;
+                }
                 throw new CheckCardException(checkResult);
             }
 
@@ -369,16 +377,41 @@ namespace EaisApi
             if (cardId.Any(c => !Char.IsDigit(c)))
             {
                 _logger?.LogError("cardId is wrong. Received html: " + html);
+                await RefreshCardFromEaistoSearch(info);
             }
 
-            return cardId;
             // jQuery(".second_cont strong")
             // http://eaisto.gibdd.ru/ru/arm/expert/new/
 
             // Referer	
             // http://eaisto.gibdd.ru/ru/arm/expert/new/index.php?
             //return await result.Content.ReadAsStringAsync();
-            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns true if card is found on eaisto server
+        /// </summary>
+        /// <param name="card"></param>
+        /// <returns></returns>
+        public async Task<bool> RefreshCardFromEaistoSearch(DiagnosticCard card)
+        {
+            try
+            {
+                var results = await Search(card.VIN, card.RegNumber);
+                var cardInfo = results.SingleOrDefault(c =>
+                    c.IssueDate == DateTime.UtcNow.AddHours(3).ToString("dd.MM.yyyy"));
+                if (cardInfo != null)
+                {
+                    card.CardId = cardInfo.RegNumber.Replace("/", "");
+                    card.ExpirationDate = DateTime.ParseExact(cardInfo.ExpirationDate, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Refresh card error: " + e);
+            }
+            return false;
         }
 
         private async Task<CheckResults> CheckForm(DiagnosticCard info)

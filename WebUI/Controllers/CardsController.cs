@@ -585,19 +585,23 @@ namespace WebUI.Controllers
 
             try
             {
-                var cardId = await _api.SaveCard(diagnosticCard);
-                diagnosticCard.CardId = cardId;
-                diagnosticCard.RegisteredDate = DateTime.UtcNow.AddHours(3);
+                var today = DateTime.UtcNow.AddHours(3);
                 // Calc expiration date
                 var monthsToAdd = 12;
                 if (diagnosticCard.CardType == CardTypes.Taxi) monthsToAdd = 6;
                 else
                 {
-                    var carAge = diagnosticCard.RegisteredDate.Value.Year - diagnosticCard.IssueYear;
+                    var carAge = today.Year - diagnosticCard.IssueYear;
                     monthsToAdd = (carAge > 7) ? 12 : 24;
                 }
-                diagnosticCard.ExpirationDate = diagnosticCard.RegisteredDate.Value.AddMonths(monthsToAdd).AddDays(-1);
+                diagnosticCard.ExpirationDate = today.AddMonths(monthsToAdd).AddDays(-1);
 
+               
+                await _api.SaveCard(diagnosticCard);
+               
+//                diagnosticCard.CardId = cardId;
+                diagnosticCard.RegisteredDate = today;
+                
                 _context.Update(diagnosticCard);
                 _context.SaveChanges();
                 this.AddInfoMessage(
@@ -627,7 +631,10 @@ namespace WebUI.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e.ToString());
-                throw new RegisterCardException("При регистрации карты в ЕАИСТО произошла ошибка! Попробуйте еще раз позже.");
+                if (!await _api.RefreshCardFromEaistoSearch(diagnosticCard))
+                {
+                    throw new RegisterCardException("При регистрации карты в ЕАИСТО произошла ошибка! Попробуйте еще раз позже.");
+                }
             }
         }
     }
