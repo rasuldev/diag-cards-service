@@ -380,6 +380,7 @@ namespace EaisApi
                 await RefreshCardFromEaistoSearch(info);
             }
 
+            info.CardId = cardId;
             // jQuery(".second_cont strong")
             // http://eaisto.gibdd.ru/ru/arm/expert/new/
 
@@ -402,7 +403,7 @@ namespace EaisApi
                     c.IssueDate == DateTime.UtcNow.AddHours(3).ToString("dd.MM.yyyy"));
                 if (cardInfo != null)
                 {
-                    card.CardId = cardInfo.RegNumber.Replace("/", "");
+                    card.CardId = cardInfo.BlankNumber.Replace("/", "");
                     card.ExpirationDate = DateTime.ParseExact(cardInfo.ExpirationDate, "dd.MM.yyyy", CultureInfo.InvariantCulture);
                     return true;
                 }
