@@ -121,11 +121,12 @@ namespace EaisApi
         /// It should be used for prolong session on EAISTO.
         /// </summary>
         /// <returns></returns>
-        public async Task ProlongSession()
+        public async Task<string> ProlongSession()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, DataUrl);
             SetSessionCookie(request);
             var response = await Client.SendAsync(request);
+            return response.StatusCode.ToString();
         }
         
         public async Task<bool> IsSessionExpired()

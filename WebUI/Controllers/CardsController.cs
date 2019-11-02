@@ -514,8 +514,8 @@ namespace WebUI.Controllers
         public async Task<string> ProlongSession()
         {
             // Fire and forget (so we don't use await)
-            await _api.ProlongSession();
-            return "";
+            var result = await _api.ProlongSession();
+            return result;
         }
 
         [HttpGet("cards/setup")]
