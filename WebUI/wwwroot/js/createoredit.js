@@ -15,6 +15,7 @@
     $('[data-toggle="tooltip"]').tooltip();
     $("#mainForm").on('submit',
         function () {
+            $("button[type=submit]").prop("disabled", "disabled");
             $("#mainForm input[type='text']").each(function () {
                 this.value = this.value.toUpperCase();
             });
