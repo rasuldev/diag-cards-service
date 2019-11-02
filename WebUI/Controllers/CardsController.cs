@@ -511,10 +511,10 @@ namespace WebUI.Controllers
 
         [HttpGet("cards/touch")]
         [Produces("text/plain")]
-        public string ProlongSession()
+        public async Task<string> ProlongSession()
         {
             // Fire and forget (so we don't use await)
-            _api.ProlongSession();
+            await _api.ProlongSession();
             return "";
         }
 
