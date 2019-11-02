@@ -585,7 +585,7 @@ namespace WebUI.Controllers
             if (!User.IsInRole(UserRoles.Admin) && diagnosticCard.UserId != _userManager.GetUserId(User))
             {
                 _logger.LogCritical($"{_userManager.GetUserName(User)} tried to register card with cardId={diagnosticCard.Id} that belongs to {diagnosticCard.User?.UserName}");
-                throw new RegisterCardException("Это карта принадлежит другому пользователю.");
+                throw new RegisterCardException("Эта карта принадлежит другому пользователю.");
             }
 
             try
