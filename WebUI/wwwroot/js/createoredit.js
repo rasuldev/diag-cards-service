@@ -14,11 +14,17 @@
         });
     $('[data-toggle="tooltip"]').tooltip();
     $("#mainForm").on('submit',
-        function () {
-            $("button[type=submit]").prop("disabled", "disabled");
-            $("#mainForm input[type='text']").each(function () {
-                this.value = this.value.toUpperCase();
-            });
+        function (e) {
+            if (!$(this).data('submitted')) {
+                $(this).data('submitted', true);
+                $("#mainForm input[type='text']").each(function () {
+                    this.value = this.value.toUpperCase();
+                });
+            }
+            else {
+                console.log("form has been already submitted");
+                e.preventDefault();
+            }
         });
 
     processExpDate();
