@@ -93,13 +93,13 @@ function processExpDate() {
     // Current date
     var regDate = strToDate($("#RegisteredDate").val());
     var cardType = $("#CardType").val();
-    var monthsToAdd = 12;
+    var carAge = regDate.getFullYear() - $("#IssueYear").val();
+    var monthsToAdd = 24;
     if (cardType === "11") {
         // if Taxi
-        monthsToAdd = 6;
+        monthsToAdd = (carAge <= 5) ? 12 : 6;
     } else {
-        var carAge = regDate.getFullYear() - $("#IssueYear").val();
-        monthsToAdd = (carAge > 7) ? 12 : 24;
+        monthsToAdd = (carAge > 10) ? 12 : 24;
     }
 
     regDate.setMonth(regDate.getMonth() + monthsToAdd);
