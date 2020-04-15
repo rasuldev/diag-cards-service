@@ -1,4 +1,6 @@
-﻿namespace EaisApi
+﻿using System.Threading.Tasks;
+
+namespace EaisApi
 {
     public class ApiUserData
     {
@@ -13,8 +15,8 @@
     }
     public interface IUserStorage
     {
-        ApiUserData LoadData();
-        void SaveData(ApiUserData data);
+        Task<ApiUserData> LoadData();
+        Task SaveData(ApiUserData data);
     }
 
     

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Session;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -30,16 +31,19 @@ namespace WebUI.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
         private readonly AppDbContext _context;
+        private readonly EaistoSessionManager _eaistoSessionManager;
 
         public AccountController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IEmailSender emailSender,
+            EaistoSessionManager eaistoSessionManager,
             ILogger<AccountController> logger, IConfiguration configuration, IHostingEnvironment hostingEnvironment, AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _eaistoSessionManager = eaistoSessionManager;
             _logger = logger;
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
@@ -55,7 +59,6 @@ namespace WebUI.Controllers
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
             ViewData["ReturnUrl"] = returnUrl;
             return View(new LoginViewModel());
         }
@@ -92,7 +95,7 @@ namespace WebUI.Controllers
                     try
                     {
                         await api.SignIn(login, pass, model.CaptchaText);
-                        var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                        var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, lockoutOnFailure: false);
                         if (signInResult.Succeeded)
                         {
                             _logger.LogInformation(1, "User logged in.");

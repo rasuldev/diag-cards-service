@@ -2,7 +2,7 @@
 function touch() {
     $.ajax({
         url: "/cards/touch",
-        timeout: 10000,
+        timeout: 20000,
         global: false,
         dataType: "text"
     });

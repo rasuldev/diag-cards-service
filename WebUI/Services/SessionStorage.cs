@@ -1,6 +1,7 @@
 ﻿using EaisApi;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace WebUI.Services
 {
@@ -14,13 +15,13 @@ namespace WebUI.Services
             _session = session;
         }
 
-        public ApiUserData LoadData()
+        public async Task<ApiUserData> LoadData()
         {
             var data = _session.GetString(UserDataKey);
             return data == null ? null : JsonConvert.DeserializeObject<ApiUserData>(data);
         }
 
-        public void SaveData(ApiUserData data)
+        public async Task SaveData(ApiUserData data)
         {
             _session.SetString(UserDataKey, JsonConvert.SerializeObject(data));
         }

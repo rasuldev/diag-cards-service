@@ -89,21 +89,24 @@ namespace WebUI
                 Path.Combine(Environment.ContentRootPath, Configuration["CardTemplatePath"]),
                 Path.Combine(Environment.ContentRootPath, Configuration["CardTemplateWithoutStampPath"])));
             services.AddSingleton(new Settings(Path.Combine(Environment.ContentRootPath, "daylimit.txt")));
+            
             // Configuring session
             // Adds a default in-memory implementation of IDistributedCache.
-            services.AddDistributedMemoryCache();
-            services.AddSession(options =>
-            {
-                // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromMinutes(20);
-                options.Cookie.HttpOnly = true;
-            });
+            //services.AddDistributedMemoryCache();
+            //services.AddSession(options =>
+            //{
+            //    // Set a short timeout for easy testing.
+            //    options.IdleTimeout = TimeSpan.FromMinutes(1);
+            //    options.Cookie.HttpOnly = true;
+            //});
 
 
             // Add Eaisto api
-            services.AddScoped<IUserStorage>(provider =>
-                new SessionStorage(provider.GetRequiredService<IHttpContextAccessor>()
-                    .HttpContext.Session));
+            //services.AddScoped<IUserStorage>(provider =>
+            //    new SessionStorage(provider.GetRequiredService<IHttpContextAccessor>()
+            //        .HttpContext.Session));
+            services.AddScoped<EaistoSessionManager>();
+            services.AddScoped<IUserStorage, DbStorage>();
 
             // Proxy
             var useProxy = Configuration["useproxy"] == "true";
@@ -211,7 +214,7 @@ namespace WebUI
                 }
             }
 
-            app.UseSession();
+            //app.UseSession();
 
             using (var serviceScope = app.ApplicationServices.CreateScope())
             {

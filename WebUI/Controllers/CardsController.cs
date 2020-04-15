@@ -27,6 +27,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using WebUI.Infrastructure;
 using WebUI.Models.CardsViewModels;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace WebUI.Controllers
 {
@@ -43,8 +44,10 @@ namespace WebUI.Controllers
         private readonly ILogger<CardsController> _logger;
         private readonly SignInManager<User> _signInManager;
         private Settings _settings;
+        private EaistoSessionManager _eaistoSessionManager;
 
-        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf, ILogger<CardsController> logger, SignInManager<User> signInManager, Settings settings)
+        public CardsController(AppDbContext context, UserManager<User> userManager, Pager pager, EaistoApi api, IConfiguration conf, 
+            ILogger<CardsController> logger, SignInManager<User> signInManager, Settings settings, EaistoSessionManager eaistoSessionManager)
         {
             _context = context;
             _userManager = userManager;
@@ -54,6 +57,19 @@ namespace WebUI.Controllers
             _logger = logger;
             _signInManager = signInManager;
             _settings = settings;
+            _eaistoSessionManager = eaistoSessionManager;
+        }
+
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            if (_eaistoSessionManager.GetSessionId() == null)
+            {
+                await _signInManager.SignOutAsync();
+                context.Result = RedirectToAction("Login", "Account");
+                return;
+            }
+
+            await next();
         }
 
         // GET: Cards
@@ -513,7 +529,6 @@ namespace WebUI.Controllers
         [Produces("text/plain")]
         public async Task<string> ProlongSession()
         {
-            // Fire and forget (so we don't use await)
             var result = await _api.ProlongSession();
             return result;
         }

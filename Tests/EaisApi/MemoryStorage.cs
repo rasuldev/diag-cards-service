@@ -1,4 +1,5 @@
 ﻿using EaisApi;
+using System.Threading.Tasks;
 
 namespace Tests.EaisApi
 {
@@ -10,12 +11,12 @@ namespace Tests.EaisApi
         {
         }
 
-        public ApiUserData LoadData()
+        public async Task<ApiUserData> LoadData()
         {
             return _data;
         }
 
-        public void SaveData(ApiUserData data)
+        public async Task SaveData(ApiUserData data)
         {
             _data = data;
         }

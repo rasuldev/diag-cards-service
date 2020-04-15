@@ -91,7 +91,7 @@ namespace EaisApi
             var dom = CQ.Create(await result.Content.ReadAsStringAsync());
             var captchaId = dom["img[name=captcha]"].Attr("id");
             // save session cookie and captcha id to user storage
-            _userStorage.SaveData(new ApiUserData(string.Join(";", cookies), captchaId));
+            await _userStorage.SaveData(new ApiUserData(string.Join(";", cookies), captchaId));
             //var captchaUrl = "http://eaisto.gibdd.ru"+dom["img[name=captcha]"].Attr("src");
             //var request = new HttpRequestMessage(HttpMethod.Get, LoginUrl);
             //var captcha = Console.ReadLine();
@@ -102,7 +102,7 @@ namespace EaisApi
         {
             var url = $"{CaptchaUrl}{captchaId}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             var result = await Client.SendAsync(request);
 
             //if (result.Headers.TryGetValues("Set-cookie", out var cookies))
@@ -124,7 +124,7 @@ namespace EaisApi
         public async Task<string> ProlongSession()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, DataUrl);
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             var response = await Client.SendAsync(request);
             return response.StatusCode.ToString();
         }
@@ -134,7 +134,7 @@ namespace EaisApi
             try
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, DataUrl);
-                SetSessionCookie(request);
+                await SetSessionCookie(request);
                 var response = await Client.SendAsync(request);
                 return sessionIsExpired(response);
             }
@@ -156,9 +156,9 @@ namespace EaisApi
         //    request.Headers.Add("Cookie", $"{SessionKey}={sessionId}");
         //}
 
-        private void SetSessionCookie(HttpRequestMessage request)
+        private async Task SetSessionCookie(HttpRequestMessage request)
         {
-            var userData = _userStorage.LoadData();
+            var userData = await _userStorage.LoadData();
             if (userData == null)
             {
                 throw new NotAuthorizedException("Session cookie is missing in user storage");
@@ -169,13 +169,13 @@ namespace EaisApi
         public async Task SignIn(string login, string password, string captcha)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, LoginUrl);
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             var content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("login", login),
                 new KeyValuePair<string, string>("pass", password),
                 new KeyValuePair<string, string>("check_3", captcha),
-                new KeyValuePair<string, string>("captcha_id_3", _userStorage.LoadData().CaptchaId)
+                new KeyValuePair<string, string>("captcha_id_3", (await _userStorage.LoadData()).CaptchaId)
             });
             request.Content = content;
             var result = await Client.SendAsync(request);
@@ -217,7 +217,7 @@ namespace EaisApi
                 .Append($"?search[VIN]={Escape(vin)}&search[REG_ZNAK]={Escape(regNumber)}&search[SERIA]={Escape(ticketSeries)}")
                 .Append($"&search[NOMER]={Escape(ticketNumber)}&search[NOMER_KUZOVA]={Escape(bodyNumber)}&search[NOMER_RAMY]={Escape(frameNumber)}");
             var request = new HttpRequestMessage(HttpMethod.Get, SearchUrl + query);
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             var response = await Client.SendAsync(request);
             if (sessionIsExpired(response))
             {
@@ -254,7 +254,7 @@ namespace EaisApi
         public async Task<VehicleRunningInfo> GetVehicleRunning(string vin)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, RunningUrl + Uri.EscapeUriString(vin));
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             var response = await Client.SendAsync(request);
             if (sessionIsExpired(response))
             {
@@ -274,7 +274,7 @@ namespace EaisApi
         public async Task<string> GetManufacturers(string query)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, SearchManufacturersUrl + Uri.EscapeUriString(query));
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             var response = await Client.SendAsync(request);
             if (sessionIsExpired(response))
             {
@@ -289,7 +289,7 @@ namespace EaisApi
         public async Task<string> GetAllManufacturers()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, SearchManufacturersUrl);
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             var response = await Client.SendAsync(request);
             if (sessionIsExpired(response))
             {
@@ -305,7 +305,7 @@ namespace EaisApi
         {
             var request = new HttpRequestMessage(HttpMethod.Get,
                 SearchModelsUrl.Replace("$man$", Uri.EscapeUriString(manufacturer)) + Uri.EscapeUriString(query));
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             var response = await Client.SendAsync(request);
             if (sessionIsExpired(response))
             {
@@ -340,7 +340,7 @@ namespace EaisApi
             }
 
             var request = new HttpRequestMessage(HttpMethod.Post, DataUrl);
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
 
             var formParams = new List<KeyValuePair<string, string>>();
             PopulateParams(formParams, info);
@@ -366,7 +366,7 @@ namespace EaisApi
             // Follow redirect to get card id
             request = new HttpRequestMessage(HttpMethod.Get, DataUrl);
             request.Headers.Referrer = new Uri("http://eaisto.gibdd.ru/ru/arm/expert/new/");
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
             response = await Client.SendAsync(request);
             if (sessionIsExpired(response))
             {
@@ -420,7 +420,7 @@ namespace EaisApi
         private async Task<CheckResults> CheckForm(DiagnosticCard info)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, DataUrl);
-            SetSessionCookie(request);
+            await SetSessionCookie(request);
 
             var formParams = new List<KeyValuePair<string, string>>();
             void Add(string key, string value) => formParams.Add(new KeyValuePair<string, string>(key, value));

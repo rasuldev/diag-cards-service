@@ -14,6 +14,7 @@ namespace WebUI.Data
     {
         public DbSet<DiagnosticCard> DiagnosticCards { get; set; }
         public DbSet<EaistoCredential> EaistoCredentials { get; set; }
+        public DbSet<EaistoSession> EaistoSessions { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -35,6 +36,8 @@ namespace WebUI.Data
             builder.Entity<DiagnosticCard>().HasIndex(e => e.DocumentNumber);
             builder.Entity<DiagnosticCard>().HasIndex(e => e.BodyNumber);
             builder.Entity<DiagnosticCard>().HasIndex(e => e.FrameNumber);
+
+            builder.Entity<EaistoSession>().Property(s => s.Id).HasMaxLength(60);
         }
 
         public DbSet<WebUI.Data.Entities.User> User { get; set; }
