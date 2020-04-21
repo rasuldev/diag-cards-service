@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,21 +19,26 @@ namespace WebUI.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<DbStorage> _logger;
 
         public DbStorage(EaistoSessionManager eaistoSessionManager, IHttpContextAccessor httpContextAccessor, 
-            AppDbContext context, UserManager<User> userManager)
+            AppDbContext context, UserManager<User> userManager, ILogger<DbStorage> logger)
         {
             _eaistoSessionManager = eaistoSessionManager;
             _httpContextAccessor = httpContextAccessor;
             _context = context;
             _userManager = userManager;
+            this._logger = logger;
         }
 
         public async Task<ApiUserData> LoadData()
         {
             var sessionId = _eaistoSessionManager.GetSessionId();
             if (sessionId == null)
+            {
+                _logger.LogInformation("Eaisto session id is null");
                 return null;
+            }
             var sessionData = await _context.EaistoSessions.SingleOrDefaultAsync(s => s.Id == sessionId);
             if (sessionData == null)
                 return null;

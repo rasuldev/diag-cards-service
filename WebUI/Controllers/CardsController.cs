@@ -300,6 +300,7 @@ namespace WebUI.Controllers
 
         private async Task<IActionResult> Logout(string returnUrl = null)
         {
+            _logger.LogInformation("User was logged out: eaisto session cookie=" + Request?.Cookies[EaistoSessionManager.EaistoSessionCookieName]);
             this.AddErrorMessage("На ЕАИСТО истекла ваша сессия. Войдите еще раз для возобновления сессии.");
             await _signInManager.SignOutAsync();
             if (returnUrl == null)
@@ -529,6 +530,8 @@ namespace WebUI.Controllers
         [Produces("text/plain")]
         public async Task<string> ProlongSession()
         {
+            var user = await _userManager.GetUserAsync(User);
+            _logger.LogInformation($"User: {user?.UserName}; eaisto session cookie=" + Request?.Cookies[EaistoSessionManager.EaistoSessionCookieName]);
             var result = await _api.ProlongSession();
             return result;
         }

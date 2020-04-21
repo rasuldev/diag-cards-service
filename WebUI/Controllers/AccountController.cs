@@ -98,7 +98,7 @@ namespace WebUI.Controllers
                         var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, lockoutOnFailure: false);
                         if (signInResult.Succeeded)
                         {
-                            _logger.LogInformation(1, "User logged in.");
+                            _logger.LogInformation(1, $"User {model.Email} logged in.");
                             return RedirectToLocal(returnUrl);
                         }
                     }

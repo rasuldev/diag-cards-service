@@ -126,6 +126,8 @@ namespace EaisApi
             var request = new HttpRequestMessage(HttpMethod.Get, DataUrl);
             await SetSessionCookie(request);
             var response = await Client.SendAsync(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+                _logger.LogError($"Eaisto prolong session error: status={response.StatusCode}; request");
             return response.StatusCode.ToString();
         }
         
@@ -161,6 +163,7 @@ namespace EaisApi
             var userData = await _userStorage.LoadData();
             if (userData == null)
             {
+                _logger.LogError($"User data is null.");
                 throw new NotAuthorizedException("Session cookie is missing in user storage");
             }
             request.Headers.Add("Cookie", userData.Cookies);
@@ -248,7 +251,10 @@ namespace EaisApi
 
         private bool sessionIsExpired(HttpResponseMessage response)
         {
-            return response.Headers.Location != null && response.Headers.Location.OriginalString.Contains("from_url");
+            var isExpired = response.Headers.Location != null && response.Headers.Location.OriginalString.Contains("from_url");
+            if (isExpired)
+                _logger.LogInformation("Eaisto session is expired");
+            return isExpired;
         }
 
         public async Task<VehicleRunningInfo> GetVehicleRunning(string vin)

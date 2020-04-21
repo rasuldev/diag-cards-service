@@ -11,7 +11,7 @@ namespace WebUI.Infrastructure
 {
     public class EaistoSessionManager
     {
-        private const string EaistoSessionCookieName = "EaistoSessionId";
+        public const string EaistoSessionCookieName = "EaistoSessionId";
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppDbContext _context;
         private string _newSessionId;
