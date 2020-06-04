@@ -117,6 +117,8 @@ namespace WebUI
                     Host = Configuration["proxy:host"],
                     Port = int.Parse(Configuration["proxy:port"]),
                     Credentials = new NetworkCredential(Configuration["proxy:login"], Configuration["proxy:password"]),
+                    ConnectTimeout = 180000,
+                    ReadWriteTimeOut = 180000
                 };
                 var proxyClientHandler = new ProxyClientHandler<Socks5>(settings)
                 {
